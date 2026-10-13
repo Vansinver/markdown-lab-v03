@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markdown 闯关实验室 V0.3 · Vansinver</title>
+<style>
+:root {
+  --bg: #f3f4ff;
+  --card: #ffffff;
+  --ink: #1f2340;
+  --muted: #6b7090;
+  --line: #e4e6f7;
+  --p1: #4f46e5;
+  --p2: #7c3aed;
+  --p3: #3b82f6;
+  --ok: #10b981;
+  --bad: #ef4444;
+  --warn: #f59e0b;
+  --grad: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  --shadow: 0 10px 30px rgba(79, 70, 229, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  line-height: 1.6;
+  font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background:
+    radial-gradient(1000px 500px at 10% -10%, #dfe3ff 0, transparent 60%),
+    radial-gradient(900px 500px at 100% 0, #eadcff 0, transparent 55%),
+    var(--bg);
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 600;
+  transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible,
+.level-card:focus-visible,
+.tab:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.45);
+  outline-offset: 2px;
+}
+
+.btn.primary {
+  color: #fff;
+  background: var(--grad);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
+.btn.soft {
+  color: var(--p1);
+  background: #eef0ff;
+}
+
+.btn.ghost {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--line);
+}
+
+.btn.danger {
+  color: #fff;
+  background: var(--bad);
+}
+
+/* ---------- Home ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: var(--grad);
+  border-radius: 28px;
+  padding: 36px 32px 28px;
+  box-shadow: var(--shadow);
+}
+
+.hero::after {
+  content: "★ ✦ ★";
+  position: absolute;
+  right: 28px;
+  top: 18px;
+  font-size: 28px;
+  letter-spacing: 8px;
+  opacity: 0.35;
+}
+
+.hero-tag {
+  display: inline-block;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hero h1 {
+  margin: 12px 0 6px;
+  font-size: clamp(28px, 5vw, 42px);
+  letter-spacing: 1px;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 640px;
+  opacity: 0.92;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.stat {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+
+.stat b {
+  display: block;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.stat span {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.progress-box {
+  margin-top: 18px;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.bar {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar > i {
+  display: block;
+  height: 100%;
+  background: #fde68a;
+  border-radius: 999px;
+  transition: width 0.4s;
+}
+
+.section-title {
+  margin: 30px 4px 12px;
+  font-size: 20px;
+}
+
+.section-sub {
+  margin: -6px 4px 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.levels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.level-card {
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.level-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(79, 70, 229, 0.2);
+}
+
+.lv-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.lv-state {
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: #f1f2fb;
+}
+
+.lv-state.done {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.lv-icon {
+  width: 52px;
+  height: 52px;
+  margin: 12px 0 8px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--grad);
+  border-radius: 16px;
+}
+
+.level-card h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.level-card p {
+  margin: 4px 0 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.lv-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.stars span.on {
+  color: #f59e0b;
+}
+
+.stars span.off {
+  color: #cbd0e6;
+}
+
+.stars {
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.kp-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.kp {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  background: #fff;
+  border: 1px dashed #c5c9e8;
+  color: #8a8fb0;
+}
+
+.kp.open {
+  border: 1px solid #a5b4fc;
+  color: var(--p1);
+  background: #eef0ff;
+  font-weight: 600;
+}
+
+.kp.done {
+  border-color: #6ee7b7;
+  color: #047857;
+  background: #d1fae5;
+}
+
+.note {
+  margin-top: 28px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.note b {
+  color: var(--ink);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Play ---------- */
+/* 计时器和导航作为轻薄的吸顶工具栏，随滚动可见，不悬浮覆盖编辑区。 */
+.play-top {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 -8px 14px;
+  padding: 9px 8px;
+  border-radius: 0 0 16px 16px;
+  background: rgba(243, 244, 255, .94);
+  border-bottom: 1px solid rgba(197,201,232,.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.play-top .timer {
+  flex: 0 0 auto;
+  box-shadow: 0 3px 12px rgba(79,70,229,.09);
+}
+/* 反馈滚动定位时给吸顶栏留出空间。 */
+#feedback { scroll-margin-top: 78px; }
+@media (max-width: 640px) {
+  .play-top { gap: 6px; padding: 7px 6px; }
+  .play-top .btn { padding: 7px 10px; }
+  .play-top .tab { padding: 5px 9px; font-size: 12px; }
+  .play-top .mode-pill { padding: 4px 8px; font-size: 11px; }
+  .play-top .timer { padding: 5px 9px; font-size: 18px; }
+  /* 小屏滚动时只保留紧凑的首页入口、模式和倒计时，关卡切换可滚回顶部使用。 */
+  .play-top.is-condensed .level-tabs { display: none; }
+  .play-top.is-condensed { justify-content: space-between; }
+  #feedback { scroll-margin-top: 70px; }
+}
+
+.level-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.tab {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tab.active {
+  color: #fff;
+  border-color: transparent;
+  background: var(--grad);
+}
+
+.timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 800;
+  padding: 6px 16px;
+  border-radius: 14px;
+  color: var(--p1);
+  background: #fff;
+  border: 2px solid #c7d2fe;
+}
+
+.timer.warn {
+  color: var(--bad);
+  border-color: #fca5a5;
+  background: #fef2f2;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.task-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+
+.task-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.task-head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--grad);
+}
+
+.task-card p {
+  margin: 8px 0;
+}
+
+.req {
+  margin: 6px 0 10px;
+  padding-left: 20px;
+  color: #3b3f66;
+}
+
+.hint-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.hints {
+  margin: 10px 0 0;
+  padding: 10px 14px 10px 32px;
+  border-radius: 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.hints:empty {
+  display: none;
+}
+
+.tabs-mobile {
+  display: none;
+  gap: 8px;
+  margin: 14px 0 8px;
+}
+
+.tabs-mobile button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.tabs-mobile button.active {
+  color: #fff;
+  background: var(--grad);
+  border-color: transparent;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.pane {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 340px;
+}
+
+.pane-title {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  background: #f8f9ff;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+}
+
+#editor {
+  flex: 1;
+  width: 100%;
+  min-height: 300px;
+  padding: 14px 16px;
+  border: 0;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: #fff;
+}
+
+#editor:read-only {
+  background: #f8f9ff;
+}
+
+#preview {
+  flex: 1;
+  padding: 14px 18px;
+  overflow: auto;
+}
+
+.empty {
+  color: #a3a8c8;
+  text-align: center;
+  margin-top: 60px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.kbd-tip {
+  align-self: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.feedback {
+  margin-top: 14px;
+}
+
+.fb {
+  border-radius: 18px;
+  padding: 14px 18px;
+  border: 1px solid;
+}
+
+.fb-bad {
+  background: #fff7f7;
+  border-color: #fecaca;
+}
+
+.fb-ok {
+  background: #f0fdf8;
+  border-color: #a7f3d0;
+}
+
+.fb-title {
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.fb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.checks li {
+  display: flex;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.checks .mark {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.checks .ok .mark {
+  background: var(--ok);
+}
+
+.checks .bad .mark {
+  background: var(--bad);
+}
+
+.checks .tip {
+  font-size: 14px;
+  color: #b45309;
+}
+
+/* ---------- Markdown preview ---------- */
+.md h1,
+.md h2,
+.md h3,
+.md h4,
+.md h5,
+.md h6 {
+  margin: 0.8em 0 0.4em;
+  line-height: 1.3;
+}
+
+.md h1 {
+  font-size: 1.9em;
+  border-bottom: 2px solid var(--line);
+  padding-bottom: 0.2em;
+}
+
+.md h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.2em;
+}
+
+.md h3 {
+  font-size: 1.25em;
+}
+
+.md h4 {
+  font-size: 1.1em;
+}
+
+.md h5,
+.md h6 {
+  font-size: 1em;
+  color: var(--muted);
+}
+
+.md p {
+  margin: 0.6em 0;
+}
+
+.md ul,
+.md ol {
+  padding-left: 1.6em;
+  margin: 0.4em 0;
+}
+
+.md blockquote {
+  margin: 0.6em 0;
+  padding: 0.2em 1em;
+  color: #4b5080;
+  border-left: 4px solid #a5b4fc;
+  background: #f5f6ff;
+}
+
+.md code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: #eef0ff;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.md pre {
+  padding: 12px;
+  border-radius: 12px;
+  background: #1f2340;
+  color: #e5e7ff;
+  overflow: auto;
+}
+
+.md pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+.md table {
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  min-width: 60%;
+}
+
+.md th,
+.md td {
+  border: 1px solid #d5d9f0;
+  padding: 6px 12px;
+}
+
+.md th {
+  background: #eef0ff;
+}
+
+.md hr {
+  border: 0;
+  border-top: 2px solid var(--line);
+  margin: 1em 0;
+}
+
+.md a {
+  color: var(--p1);
+}
+
+/* ---------- Modal ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(31, 35, 64, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.modal {
+  width: min(480px, 100%);
+  max-height: 88vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal h3 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.stars.big {
+  font-size: 40px;
+  text-align: center;
+  margin: 4px 0 10px;
+}
+
+table.score {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+table.score td {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+table.score td:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+table.score tr.total td {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--p1);
+  border-bottom: 0;
+}
+
+@media (max-width: 820px) {
+  .tabs-mobile {
+    display: flex;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace .pane {
+    display: none;
+  }
+
+  .workspace[data-pane="edit"] .pane-edit {
+    display: flex;
+  }
+
+  .workspace[data-pane="preview"] .pane-preview {
+    display: flex;
+  }
+
+  .hero {
+    padding: 28px 20px 22px;
+  }
+
+  .hero::after {
+    display: none;
+  }
+}
+
+/* V0.2 双模式入口与无计时训练样式 */
+.mode-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 14px 0 16px; }
+.mode-choice { text-align: left; background: #fff; border: 2px solid var(--line); border-radius: 21px; padding: 19px 20px; color: var(--ink); box-shadow: var(--shadow); transition: border-color .15s, transform .15s, background .15s; }
+.mode-choice:hover { transform: translateY(-2px); }
+.mode-choice.selected { border-color: var(--p1); background: #f2f1ff; }
+.mode-choice:focus-visible { outline: 3px solid rgba(99,102,241,.4); outline-offset: 2px; }
+.mode-choice strong { display: block; font-size: 19px; margin: 5px 0 2px; }
+.mode-choice .choice-icon { font-size: 26px; }
+.mode-choice .mode-desc { display: block; color: var(--muted); font-size: 13px; }
+.mode-choice .choice-state { display: block; color: var(--p1); font-size: 12px; margin-top: 9px; font-weight: 700; }
+.mode-pill { border: 1px solid #c7d2fe; background: #eef0ff; color: var(--p1); padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+.mode-pill.is-practice { border-color: #a7f3d0; background: #ecfdf5; color: #047857; }
+.mode-notice { margin: 0 0 12px; padding: 10px 14px; background: #eef0ff; border: 1px solid #d5d8ff; color: #45459a; border-radius: 14px; font-size: 13px; }
+.mode-notice.practice { background: #f0fdf8; color: #047857; border-color: #b7efdc; }
+.stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat b { font-size: 24px; }
+@media (max-width: 640px) {
+  .mode-choices { grid-template-columns: 1fr; gap: 10px; }
+  .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .stat b { font-size: 22px; }
+  .mode-choice { padding: 15px 16px; }
+}
+
+/* V0.2.1：可选的认知彩蛋，不影响判题与计分 */
+.topic-teaser { margin: 12px 0 0; padding: 10px 13px; border: 1px dashed #b8bef4; background: #f8f7ff; color: #4b5080; border-radius: 12px; font-size: 13px; }
+.knowledge-box { margin-top: 22px; padding: 22px; background: #fff; border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); }
+.knowledge-box h3 { margin: 0 0 6px; }
+.knowledge-box p { margin: 5px 0 12px; color: var(--muted); font-size: 14px; }
+.knowledge-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.kcard-summary { background: #f4f5ff; padding: 12px 14px; border-radius: 12px; }
+.kcard-summary p { margin: 6px 0; }
+.card-reflection { display: block; width: 100%; min-height: 78px; resize: vertical; font: inherit; border-radius: 12px; border: 1px solid #cbd0e6; padding: 10px; margin-top: 8px; }
+.card-reflection:focus-visible { outline: 2px solid #6366f1; }
+.kcard-label { display: block; margin: 14px 0 3px; font-size: 14px; font-weight: 700; }
+.kcard-note { font-size: 12px; color: var(--muted); }
+
+/* V0.2.3 · Vansinver creator mark and restrained success celebration */
+.brand-signature { display: flex; align-items: center; gap: 9px; margin-bottom: 15px; font-size: 13px; }
+.brand-monogram { display: inline-grid; place-items: center; width: 33px; height: 33px; border: 1px solid rgba(255,255,255,.55); border-radius: 10px; background: rgba(255,255,255,.17); font-size: 17px; font-weight: 900; }
+.brand-wordmark { font-weight: 800; letter-spacing: .9px; }
+.brand-byline { opacity: .8; font-size: 12px; }
+.site-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin: 24px 0 0; padding: 16px 2px 0; border-top: 1px solid #dfe1f1; color: var(--muted); font-size: 12px; }
+.site-footer strong { color: var(--ink); letter-spacing: .5px; }
+.confetti-layer { position: fixed; inset: 0; z-index: 75; overflow: hidden; pointer-events: none; }
+.confetti-piece { position: absolute; width: 9px; height: 15px; border-radius: 2px; opacity: 0; transform: translate(-50%, -50%); animation: confetti-burst 1400ms cubic-bezier(.18,.66,.38,1) both; }
+.confetti-piece:nth-child(3n) { width: 7px; height: 9px; border-radius: 50%; }
+@keyframes confetti-burst {
+  0% { opacity: 1; transform: translate(-50%, -50%) rotate(0deg) scale(.75); }
+  38% { opacity: 1; transform: translate(calc(-50% + var(--mid-x)), calc(-50% + var(--rise))) rotate(var(--spin-mid)) scale(1); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--fall))) rotate(var(--spin)) scale(.85); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti-layer { display: none !important; }
+  .confetti-piece { animation: none !important; }
+}
+  .md dl { margin: .8em 0; padding: .5em 1em; background:#f8f9ff; border-left: 4px solid #a5b4fc; border-radius:8px; }
+  .md dt { font-weight:750; margin-top:.5em; }
+  .md dd { margin:.15em 0 .6em 1.3em; }
+  .md li.task-item { list-style:none; margin-left:-1em; }
+  .md .task-line { cursor:default; }
+  .md .task-line input { accent-color: #6366f1; pointer-events:none; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 首页 -->
+  <section id="homeView"></section>
+
+  <!-- 练习界面 -->
+  <section id="playView" hidden>
+    <header class="play-top">
+      <button class="btn ghost" data-action="home">← 首页</button>
+      <nav class="level-tabs" id="levelTabs" aria-label="切换关卡"></nav>
+      <span class="mode-pill" id="modePill">自由练习</span>
+      <div class="timer" id="timer" role="timer">05:00</div>
+    </header>
+
+    <div class="mode-notice" id="modeNotice"></div>
+
+    <div class="task-card">
+      <div class="task-head">
+        <span class="badge" id="taskBadge"></span>
+        <h2 id="taskTitle"></h2>
+      </div>
+      <p id="taskDesc"></p>
+      <ul class="req" id="taskReq"></ul>
+      <div class="topic-teaser" id="topicTeaser" hidden></div>
+      <div class="hint-bar">
+        <button class="btn soft" id="btnHint" data-action="hint">💡 查看提示</button>
+        <span class="meta" id="metaInfo"></span>
+      </div>
+      <ol class="hints" id="hintList"></ol>
+    </div>
+
+    <div class="tabs-mobile" role="group" aria-label="切换视图">
+      <button id="tabEdit" data-action="pane" data-pane="edit" class="active">✍️ 输入</button>
+      <button id="tabPreview" data-action="pane" data-pane="preview">👀 预览</button>
+    </div>
+
+    <div class="workspace" id="workspace" data-pane="edit">
+      <div class="pane pane-edit">
+        <div class="pane-title"><span>Markdown 输入</span><span>Tab = 2 空格 · Esc 后 Tab 可离开输入框</span></div>
+        <textarea id="editor" maxlength="4000" spellcheck="false" autocomplete="off" autocapitalize="off"
+          aria-label="Markdown 输入区" placeholder="在这里输入 Markdown……"></textarea>
+      </div>
+      <div class="pane pane-preview">
+        <div class="pane-title"><span>实时渲染</span><span>内置简化解析器</span></div>
+        <div id="preview" class="md"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="btnSubmit" data-action="submit">✅ 提交答案</button>
+      <button class="btn soft" id="btnRetry" data-action="retry">🔄 重新练习</button>
+      <span class="kbd-tip">快捷键：Ctrl / ⌘ + Enter 提交</span>
+    </div>
+
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+  </section>
+  <footer class="site-footer" aria-label="网站作者署名与版权信息">
+    <span><strong>Vansinver</strong> · 设计与制作 · © 2026 Vansinver</span>
+    <span>Markdown 闯关实验室 · 独立制作的练习工具（非研学社官方考核）</span>
+  </footer>
+
+</div>
+<div id="modalRoot"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =====================================================
+   * Markdown 闯关实验室 V0.3
+   * 无第三方依赖：自带简化 Markdown 解析器 + 结构化判题
+   * ===================================================== */
+
+  const TOTAL_SECONDS = 300;
+  const STORE_KEY = 'mdlab_v01_progress';
+  const $ = function (s) { return document.querySelector(s); };
+
+  /* ---------------- 存储（localStorage 不可用时降级为内存） ---------------- */
+  const Store = (function () {
+    let ok = false;
+    let mem = null;
+    try {
+      localStorage.setItem('__mdlab_t', '1');
+      localStorage.removeItem('__mdlab_t');
+      ok = true;
+    } catch (e) {
+      ok = false;
+    }
+    return {
+      persistent: ok,
+      load: function () {
+        if (ok) {
+          try {
+            const raw = localStorage.getItem(STORE_KEY);
+            if (raw) return JSON.parse(raw);
+          } catch (e) { /* ignore */ }
+          return null;
+        }
+        return mem;
+      },
+      save: function (d) {
+        mem = d;
+        if (ok) {
+          try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) { /* ignore */ }
+        }
+      },
+      clear: function () {
+        mem = null;
+        if (ok) {
+          try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+        }
+      }
+    };
+  })();
+
+  /* ---------------- 工具 ---------------- */
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function starsHtml(n) {
+    let h = '';
+    for (let i = 1; i <= 3; i++) {
+      h += '<span class="' + (i <= n ? 'on' : 'off') + '">' + (i <= n ? '★' : '☆') + '</span>';
+    }
+    return h;
+  }
+
+  /* =====================================================
+   * 一、Markdown 解析器（输出 AST，再渲染成安全 HTML）
+   * ===================================================== */
+  const RE = {
+    fence: /^ {0,3}(`{3,}|~{3,})(.*)$/,
+    hr: /^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/,
+    atx: /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?(?:[ \t]+#+)?[ \t]*$/,
+    ul: /^( *)([-*+])[ \t]+(.*)$/,
+    ol: /^( *)(\d{1,9})([.)])[ \t]+(.*)$/,
+    quote: /^ {0,3}>/,
+    tableDelim: /^ *\|? *:?-+:? *(?:\| *:?-+:? *)*\|? *$/
+  };
+
+  function splitRow(line) {
+    let s = line.trim();
+    if (s.charAt(0) === '|') s = s.slice(1);
+    if (s.length && s.charAt(s.length - 1) === '|' && s.slice(-2) !== '\\|') s = s.slice(0, -1);
+    const cells = [];
+    let cur = '';
+    for (let k = 0; k < s.length; k++) {
+      const c = s.charAt(k);
+      if (c === '\\' && s.charAt(k + 1) === '|') {
+        cur += '\\|';
+        k++;
+      } else if (c === '|') {
+        cells.push(cur.trim());
+        cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    cells.push(cur.trim());
+    return cells;
+  }
+
+  function parseMarkdown(text) {
+    const lines = String(text).replace(/\r\n?/g, '\n').replace(/\t/g, '    ').split('\n');
+    return parseBlocks(lines);
+  }
+
+  function parseBlocks(lines) {
+    const blocks = [];
+    let i = 0;
+
+    function isBlank(l) { return /^\s*$/.test(l); }
+
+    function isTableStart(idx) {
+      const a = lines[idx];
+      const b = lines[idx + 1];
+      if (a === undefined || b === undefined) return false;
+      if (a.indexOf('|') < 0 || b.indexOf('|') < 0) return false;
+      if (isBlank(a)) return false;
+      if (!RE.tableDelim.test(b)) return false;
+      return splitRow(a).length === splitRow(b).length;
+    }
+
+    function startsBlock(idx) {
+      const l = lines[idx];
+      if (RE.fence.test(l) || RE.hr.test(l) || RE.atx.test(l) || RE.quote.test(l)) return true;
+      const um = RE.ul.exec(l);
+      if (um && um[3].trim() !== '') return true;
+      const om = RE.ol.exec(l);
+      if (om && om[2] === '1' && om[4].trim() !== '') return true;
+      return isTableStart(idx) || (idx + 1 < lines.length && /^ {0,3}:[ \t]+\S/.test(lines[idx + 1]));
+    }
+
+    while (i < lines.length) {
+      const l = lines[i];
+
+      if (isBlank(l)) { i++; continue; }
+
+      // 代码块
+      const fm = RE.fence.exec(l);
+      if (fm) {
+        const ch = fm[1].charAt(0);
+        const len = fm[1].length;
+        const closeRe = new RegExp('^ {0,3}' + (ch === '`' ? '`' : '~') + '{' + len + ',}\\s*$');
+        const body = [];
+        i++;
+        while (i < lines.length) {
+          if (closeRe.test(lines[i])) { i++; break; }
+          body.push(lines[i]);
+          i++;
+        }
+        blocks.push({ type: 'code', lang: fm[2].trim(), text: body.join('\n') });
+        continue;
+      }
+
+      // 定义列表扩展语法：术语下一行用「: 解释」。这是本网站明确支持的扩展，不属于所有 Markdown 渲染器的默认功能。
+      if (i + 1 < lines.length && !isBlank(l) && /^ {0,3}:[ \t]+\S/.test(lines[i + 1])) {
+        const items = [];
+        while (i + 1 < lines.length && !isBlank(lines[i]) && /^ {0,3}:[ \t]+\S/.test(lines[i + 1])) {
+          const term = lines[i].trim();
+          const defs = [];
+          i++;
+          while (i < lines.length && /^ {0,3}:[ \t]+\S/.test(lines[i])) {
+            defs.push(lines[i].replace(/^ {0,3}:[ \t]+/, '').trim());
+            i++;
+          }
+          items.push({term: term, defs: defs});
+          // 下一对术语前允许空行。
+          let j = i;
+          while (j < lines.length && isBlank(lines[j])) j++;
+          if (j + 1 < lines.length && /^ {0,3}:[ \t]+\S/.test(lines[j + 1])) i = j;
+          else break;
+        }
+        blocks.push({type: 'definition', items: items});
+        continue;
+      }
+
+      // 表格
+      if (isTableStart(i)) {
+        const header = splitRow(lines[i]);
+        const delim = splitRow(lines[i + 1]);
+        const align = delim.map(function (d) {
+          const left = d.charAt(0) === ':';
+          const right = d.charAt(d.length - 1) === ':';
+          return left && right ? 'center' : right ? 'right' : left ? 'left' : null;
+        });
+        i += 2;
+        const rows = [];
+        while (i < lines.length && !isBlank(lines[i]) && !RE.fence.test(lines[i]) &&
+               !RE.atx.test(lines[i]) && !RE.quote.test(lines[i]) &&
+               !RE.hr.test(lines[i]) && !RE.ul.test(lines[i]) && !RE.ol.test(lines[i])) {
+          rows.push(splitRow(lines[i]));
+          i++;
+        }
+        blocks.push({ type: 'table', header: header, align: align, rows: rows });
+        continue;
+      }
+
+      // 分隔线
+      if (RE.hr.test(l)) {
+        blocks.push({ type: 'hr' });
+        i++;
+        continue;
+      }
+
+      // ATX 标题
+      const hm = RE.atx.exec(l);
+      if (hm) {
+        blocks.push({ type: 'heading', level: hm[1].length, text: (hm[2] || '').trim() });
+        i++;
+        continue;
+      }
+
+      // 引用
+      if (RE.quote.test(l)) {
+        const inner = [];
+        while (i < lines.length && RE.quote.test(lines[i])) {
+          inner.push(lines[i].replace(/^ {0,3}> ?/, ''));
+          i++;
+        }
+        blocks.push({ type: 'blockquote', children: parseBlocks(inner) });
+        continue;
+      }
+
+      // 列表
+      if (RE.ul.test(l) || RE.ol.test(l)) {
+        const items = [];
+        while (i < lines.length) {
+          const cur = lines[i];
+          if (isBlank(cur)) {
+            let k = i + 1;
+            while (k < lines.length && isBlank(lines[k])) k++;
+            if (k < lines.length && (RE.ul.test(lines[k]) || RE.ol.test(lines[k])) && !RE.hr.test(lines[k])) {
+              i = k;
+              continue;
+            }
+            break;
+          }
+          if (RE.hr.test(cur)) break;
+          const a = RE.ul.exec(cur);
+          const b = RE.ol.exec(cur);
+          if (a) {
+            const afterA = cur.slice(a[1].length + 1).match(/^ */)[0].length;
+            items.push({
+              indent: a[1].length,
+              ordered: false,
+              marker: a[2],
+              start: 1,
+              text: a[3],
+              contentCol: a[1].length + 1 + (afterA >= 5 ? 1 : afterA)
+            });
+            i++;
+            continue;
+          }
+          if (b) {
+            const markLen = b[2].length + 1;
+            const afterB = cur.slice(b[1].length + markLen).match(/^ */)[0].length;
+            items.push({
+              indent: b[1].length,
+              ordered: true,
+              marker: b[3],
+              start: parseInt(b[2], 10),
+              text: b[4],
+              contentCol: b[1].length + markLen + (afterB >= 5 ? 1 : afterB)
+            });
+            i++;
+            continue;
+          }
+          if (items.length && /^\s+\S/.test(cur)) {
+            items[items.length - 1].text += ' ' + cur.trim();
+            i++;
+            continue;
+          }
+          break;
+        }
+        buildLists(items).forEach(function (lst) {
+          blocks.push(lst);
+        });
+        continue;
+      }
+
+            // 段落 / Setext 标题
+      const para = [l.replace(/^\s+/, '')];
+      i++;
+      let setext = 0;
+      while (i < lines.length && !isBlank(lines[i])) {
+        const sm = /^ {0,3}(=+|-+)[ \t]*$/.exec(lines[i]);
+        if (sm) {
+          setext = sm[1].charAt(0) === '=' ? 1 : 2;
+          i++;
+          break;
+        }
+        if (startsBlock(i)) break;
+        para.push(lines[i].replace(/^\s+/, ''));
+        i++;
+      }
+      if (setext) {
+        blocks.push({ type: 'heading', level: setext, text: para.join(' ').trim() });
+      } else {
+        blocks.push({ type: 'paragraph', text: para.join('\n') });
+      }
+    }
+    return blocks;
+  }
+
+  function buildLists(items) {
+    const roots = [];
+    const stack = [];
+
+    function newFrame(it, owner, minIndent) {
+      const list = {
+        type: it.ordered ? 'ol' : 'ul',
+        start: it.start || 1,
+        marker: it.marker,
+        key: (it.ordered ? 'ol' : 'ul') + it.marker,
+        items: []
+      };
+      owner.push(list);
+      return { list: list, owner: owner, minIndent: minIndent };
+    }
+
+    items.forEach(function (it) {
+      const node = {
+        text: it.text,
+        marker: it.marker,
+        ordered: it.ordered,
+        num: it.start,
+        contentCol: it.contentCol,
+        children: []
+      };
+      const key = (it.ordered ? 'ol' : 'ul') + it.marker;
+
+      if (!stack.length) {
+        stack.push(newFrame(it, roots, 0));
+      } else {
+        let top = stack[stack.length - 1];
+        const last = top.list.items[top.list.items.length - 1];
+        if (it.indent >= last.contentCol) {
+          // 缩进达到上一项的内容列：成为它的子列表
+          stack.push(newFrame(it, last.children, last.contentCol));
+        } else {
+          // 缩进小于当前子列表所属父项的内容列：回到上一层
+          while (stack.length > 1 && it.indent < stack[stack.length - 1].minIndent) {
+            stack.pop();
+          }
+          top = stack[stack.length - 1];
+          // 同一层级的类型或标记变化：结束当前列表，开启新列表
+          if (top.list.key !== key) {
+            stack[stack.length - 1] = newFrame(it, top.owner, top.minIndent);
+          }
+        }
+      }
+      stack[stack.length - 1].list.items.push(node);
+    });
+
+    return roots;
+  }
+
+    /* ---------------- 行内渲染（先转义，再处理语法） ---------------- */
+  function safeUrl(u) {
+    const raw = u.replace(/&amp;/g, '&').replace(/[\u0000-\u001f\u007f-\u009f]/g, '');
+    if (/^[a-z][a-z0-9+.\-]*:/i.test(raw)) {
+      return /^(https?:|mailto:)/i.test(raw) ? raw.replace(/&/g, '&amp;') : '#';
+    }
+    return raw.replace(/&/g, '&amp;');
+  }
+
+  function emph(x) {
+    return x
+      .replace(/\*\*\*(?=\S)([\s\S]*?\S)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(?=\S)([\s\S]*?\S)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^\w])__(?=\S)([\s\S]*?\S)__(?!\w)/g, '$1<strong>$2</strong>')
+      .replace(/\*(?=\S)([^*]*?\S)\*/g, '<em>$1</em>')
+      .replace(/(^|[^\w])_(?=\S)([^_]*?\S)_(?!\w)/g, '$1<em>$2</em>')
+      .replace(/~~(?=\S)([\s\S]*?\S)~~/g, '<del>$1</del>');
+  }
+
+  function renderInline(src) {
+    const stash = [];
+    function put(html) {
+      stash.push(html);
+      return '\u0000' + (stash.length - 1) + '\u0000';
+    }
+    let s = String(src).replace(/\u0000/g, '');
+
+    // 行内代码
+    s = s.replace(/(`+)(?!`)([\s\S]*?[^`])\1(?!`)/g, function (m, a, b) {
+      return put('<code>' + escapeHtml(b.trim()) + '</code>');
+    });
+    // 两个尾随空格或行末反斜杠：真正的硬换行，先占位避免被普通空格清理吞掉。
+    s = s.replace(/(?: {2,}|\\)\n/g, function () { return put('<br>'); });
+    // 反斜杠转义
+    s = s.replace(/\\([\\`*_{}\[\]()#+\-.!|~>])/g, function (m, c) {
+      return put(escapeHtml(c));
+    });
+    s = escapeHtml(s);
+    // 链接
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+&quot;(.*?)&quot;)?\)/g, function (m, t, u, title) {
+      return put('<a href="' + safeUrl(u) + '" target="_blank" rel="noopener noreferrer"' +
+        (title ? ' title="' + title + '"' : '') + '>' + emph(t) + '</a>');
+    });
+    s = emph(s);
+    s = s.replace(/ {2,}\n/g, '<br>').replace(/\n/g, ' ').trim();
+
+    while (/\u0000\d+\u0000/.test(s)) {
+      s = s.replace(/\u0000(\d+)\u0000/g, function (m, n) { return stash[parseInt(n, 10)]; });
+    }
+    return s;
+  }
+
+  // 纯文本（判题用）：去掉行内标记
+  function plainText(s) {
+    let t = String(s);
+    t = t.replace(/`+([^`]*?)`+/g, '$1');
+    t = t.replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1');
+    t = t.replace(/(\*\*|__)(.+?)\1/g, '$2');
+    t = t.replace(/(\*|_)(.+?)\1/g, '$2');
+    t = t.replace(/~~(.+?)~~/g, '$1');
+    t = t.replace(/\\([\\`*_{}\[\]()#+\-.!|~>])/g, '$1');
+    return t.replace(/\s+/g, ' ').trim();
+  }
+
+  function norm(s) {
+    return plainText(s).toLowerCase()
+      .replace(/([a-z0-9])\s+(?=[\u3400-\u9fff])/g, '$1')
+      .replace(/([\u3400-\u9fff])\s+(?=[a-z0-9])/g, '$1');
+  }
+
+  /* ---------------- 块渲染 ---------------- */
+  function renderBlocks(blocks) {
+    return blocks.map(function (b) {
+      switch (b.type) {
+        case 'heading':
+          return '<h' + b.level + '>' + renderInline(b.text) + '</h' + b.level + '>';
+        case 'paragraph':
+          return '<p>' + renderInline(b.text) + '</p>';
+        case 'hr':
+          return '<hr>';
+        case 'code':
+          return '<pre><code>' + escapeHtml(b.text) + '</code></pre>';
+        case 'blockquote':
+          return '<blockquote>' + renderBlocks(b.children) + '</blockquote>';
+        case 'ul':
+        case 'ol':
+          return renderList(b);
+        case 'table':
+          return renderTable(b);
+        case 'definition':
+          return '<dl>' + b.items.map(function (it) { return '<dt>' + renderInline(it.term) + '</dt>' + it.defs.map(function (d) { return '<dd>' + renderInline(d) + '</dd>'; }).join(''); }).join('') + '</dl>'; 
+        default:
+          return '';
+      }
+    }).join('');
+  }
+
+  function renderList(l) {
+    const start = (l.type === 'ol' && l.start !== 1) ? ' start="' + (parseInt(l.start, 10) || 1) + '"' : '';
+    return '<' + l.type + start + '>' + l.items.map(function (it) {
+      const task = l.type === 'ul' && /^\[([ xX])\][ \t]+(.+)$/.exec(it.text);
+      const body = task ? '<label class="task-line"><input type="checkbox" disabled ' + (/[xX]/.test(task[1]) ? 'checked ' : '') + 'aria-label="任务状态"> ' + renderInline(task[2]) + '</label>' : renderInline(it.text);
+      return '<li' + (task ? ' class="task-item"' : '') + '>' + body + it.children.map(renderList).join('') + '</li>';
+    }).join('') + '</' + l.type + '>';
+  }
+
+  function renderTable(t) {
+    const n = t.header.length;
+    function al(i) {
+      return t.align[i] ? ' style="text-align:' + t.align[i] + '"' : '';
+    }
+    let h = '<table><thead><tr>' + t.header.map(function (c, i) {
+      return '<th' + al(i) + '>' + renderInline(c) + '</th>';
+    }).join('') + '</tr></thead>';
+    if (t.rows.length) {
+      h += '<tbody>' + t.rows.map(function (r) {
+        let tds = '';
+        for (let i = 0; i < n; i++) tds += '<td' + al(i) + '>' + renderInline(r[i] || '') + '</td>';
+        return '<tr>' + tds + '</tr>';
+      }).join('') + '</tbody>';
+    }
+    return h + '</table>';
+  }
+
+  /* =====================================================
+   * 二、判题（基于解析后的结构，而非字符串比较）
+   * ===================================================== */
+  const BN = {
+    heading: '标题',
+    paragraph: '普通文字段落',
+    ul: '无序列表',
+    ol: '有序列表',
+    blockquote: '引用',
+    code: '代码块',
+    hr: '分隔线',
+    table: '表格',
+    definition: '定义列表'
+  };
+
+  function check(ok, label, tip) {
+    return { ok: !!ok, label: label, tip: tip || '' };
+  }
+
+  function blockNames(arr) {
+    const seen = [];
+    arr.forEach(function (b) {
+      const n = BN[b.type] || b.type;
+      if (seen.indexOf(n) < 0) seen.push(n);
+    });
+    return seen.join('、');
+  }
+
+  const LVN = { 1: '一级标题', 2: '二级标题', 3: '三级标题' };
+
+  function judgeHeadings(text, blocks) {
+    const lines = text.split(/\r?\n/);
+    const hs = blocks.filter(function (b) { return b.type === 'heading'; });
+    const noSpace = lines.find(function (l) { return /^ {0,3}#{1,6}[^#\s]/.test(l); });
+    const tooMany = lines.find(function (l) { return /^ {0,3}#{7,}/.test(l); });
+    const spaceNote = noSpace ? '（注意：“' + noSpace.trim() + '” 的 # 后面缺少空格）' : '';
+    const checks = [];
+
+    let tip = '';
+    if (!hs.length) {
+      if (noSpace) tip = '“' + noSpace.trim() + '” 里 # 后面缺少空格。标题要写成「# 空格 文字」。';
+      else if (tooMany) tip = 'Markdown 最多只有 6 级标题，# 不能超过 6 个。';
+      else tip = '标题以 # 开头，后面加一个空格再写文字，例如：# Markdown 学习笔记';
+    }
+    checks.push(check(hs.length > 0, '识别到 Markdown 标题', tip));
+
+    const found = {};
+    [[1, 'Markdown 学习笔记'], [2, '基础语法'], [3, '标题']].forEach(function (w) {
+      const lv = w[0];
+      const t = w[1];
+      const same = hs.filter(function (h) { return h.level === lv; });
+      const exact = same.filter(function (h) { return norm(h.text) === norm(t); });
+      let tp = '';
+      if (same.length > 1) {
+        tp = '本关只需要 1 个' + LVN[lv] + '，请删除多余的。';
+      } else if (!same.length) {
+        const other = hs.find(function (h) { return norm(h.text) === norm(t); });
+        tp = other
+          ? '“' + t + '” 目前是 ' + other.level + ' 级标题，请改成 ' + lv + ' 级：' + '#'.repeat(lv) + ' ' + t
+          : '缺少' + LVN[lv] + '，请添加：' + '#'.repeat(lv) + ' ' + t + spaceNote;
+      } else if (!exact.length) {
+        tp = LVN[lv] + '的文字是“' + plainText(same[0].text) + '”，需要改成“' + t + '”。';
+      }
+      const ok = same.length === 1 && exact.length === 1;
+      if (ok) found[lv] = hs.indexOf(same[0]);
+      checks.push(check(ok, LVN[lv] + '：' + t, tp));
+    });
+
+    const allFound = found[1] !== undefined && found[2] !== undefined && found[3] !== undefined;
+    checks.push(check(
+      allFound && found[1] < found[2] && found[2] < found[3],
+      '顺序依次为：一级 → 二级 → 三级',
+      allFound ? '三个标题的顺序需要是：一级、二级、三级。' : '先补全上面缺少或写错的标题。'
+    ));
+
+    const extras = blocks.filter(function (b) { return b.type !== 'heading'; });
+    let tipEx = '';
+    if (extras.length) tipEx = '发现与本关无关的内容：' + blockNames(extras) + '。本关只需要这三个标题，请删除。';
+    else if (hs.length > 3) tipEx = '多出了 ' + (hs.length - 3) + ' 个标题，本关只需要三个。';
+    checks.push(check(blocks.length === 3 && extras.length === 0, '没有多余内容（只需要这三个标题）', tipEx));
+    return checks;
+  }
+
+  function flatItems(lists) {
+    let out = [];
+    lists.forEach(function (l) {
+      out = out.concat(l.items);
+    });
+    return out;
+  }
+
+  // 深度优先、按文档顺序查找第一个有序项
+  function findFirstOrdered(lists) {
+    for (let a = 0; a < lists.length; a++) {
+      const its = lists[a].items;
+      for (let b = 0; b < its.length; b++) {
+        if (its[b].ordered) return its[b];
+        const r = findFirstOrdered(its[b].children);
+        if (r) return r;
+      }
+    }
+    return null;
+  }
+
+  // 同一层级的一组相邻列表里，如果出现多种无序符号，返回这些符号；否则递归检查子层级
+  function findMixedMarkers(group) {
+    const marks = [];
+    group.forEach(function (l) {
+      if (l.type === 'ul' && marks.indexOf(l.marker) < 0) marks.push(l.marker);
+    });
+    if (marks.length > 1) return marks;
+    for (let a = 0; a < group.length; a++) {
+      const its = group[a].items;
+      for (let b = 0; b < its.length; b++) {
+        const r = findMixedMarkers(its[b].children);
+        if (r) return r;
+      }
+    }
+    return null;
+  }
+
+  // 把顶层连续的列表块归为一组（即同一层级）
+  function listRuns(blocks) {
+    const runs = [];
+    let cur = null;
+    blocks.forEach(function (b) {
+      if (b.type === 'ul' || b.type === 'ol') {
+        if (!cur) {
+          cur = [];
+          runs.push(cur);
+        }
+        cur.push(b);
+      } else {
+        cur = null;
+      }
+    });
+    return runs;
+  }
+
+  function judgeUl(text, blocks) {
+    const lines = text.split(/\r?\n/);
+    const checks = [];
+    const topLists = blocks.filter(function (b) { return b.type === 'ul' || b.type === 'ol'; });
+    const uls = blocks.filter(function (b) { return b.type === 'ul'; });
+    const hasOl = blocks.some(function (b) { return b.type === 'ol'; });
+    const noSpace = lines.find(function (l) { return /^\s*[-+*](?![\s\-+*])\S/.test(l); });
+    const noSpaceNote = noSpace ? '（注意：“' + noSpace.trim() + '” 的符号后缺少空格）' : '';
+
+    // 展平：把拆分出来的多个顶层列表按顺序合并，便于后面的结构检查给出准确原因
+    const topItems = flatItems(topLists);
+    const topTexts = topItems.map(function (i) { return norm(i.text); });
+    const TOP = ['明确问题', 'ai工具', '核对结果'];
+
+    // 1. 是否使用无序列表语法
+    let tip1 = '';
+    if (!uls.length) {
+      if (hasOl) tip1 = '你写的是有序列表（1. 2. 3.）。本关需要无序列表，请把数字改成 - 、* 或 +。';
+      else if (noSpace) tip1 = '“' + noSpace.trim() + '” 的符号后面缺少空格。应写成「- 空格 文字」。';
+      else tip1 = '无序列表每行以 - 、* 或 + 开头，后面加一个空格，例如：- 明确问题';
+    }
+    checks.push(check(uls.length > 0, '使用无序列表语法（- 、* 或 + 后加空格）', tip1));
+
+    // 2. 所有层级都不能出现有序列表标记
+    const firstOrd = findFirstOrdered(topLists);
+    let tip2 = '';
+    if (!topItems.length) {
+      tip2 = '先写出一个无序列表。';
+    } else if (firstOrd) {
+      tip2 = '「' + plainText(firstOrd.text) + '」前面用了 ' + firstOrd.num + firstOrd.marker +
+        '（有序列表标记），本关请改成 - 、* 或 +。注意：子项目的名称不决定列表类型，只有其前面的 Markdown 标记才决定类型。';
+    }
+    checks.push(check(
+      topItems.length > 0 && !firstOrd,
+      '所有项目都使用无序列表符号（不出现 1. 2. 这样的数字）',
+      tip2
+    ));
+
+    // 3. 同一层级不混用不同的无序符号
+    let mixed = null;
+    listRuns(blocks).forEach(function (run) {
+      if (!mixed) mixed = findMixedMarkers(run);
+    });
+    checks.push(check(
+      !mixed,
+      '同一层级使用同一种无序符号（不同层级可以不同）',
+      mixed
+        ? '同一层级混用了不同的符号（' + mixed.join(' 和 ') + '）。Markdown 会把它们拆成多个独立列表，预览里列表会被断开。请把同一层级统一成一种符号。'
+        : ''
+    ));
+
+    // 4. 一级项目依次为：明确问题、AI工具、核对结果
+    let tipTop = '';
+    if (!topItems.length) {
+      tipTop = '先写出一个无序列表。';
+    } else if (topTexts.indexOf('对话助手') >= 0 && topTexts.indexOf('工具型助手') >= 0) {
+      tipTop = '“对话助手”和“工具型助手”应该是「AI工具」的子项目：在它们前面缩进 2 个空格（或按 Tab 键）。';
+    } else {
+      tipTop = '一级项目应依次为：明确问题、AI工具、核对结果；目前识别到：' +
+        (topItems.map(function (i) { return plainText(i.text); }).join('、') || '（无）') + '。' + noSpaceNote;
+    }
+    checks.push(check(
+      topTexts.length === 3 && TOP.every(function (t, i) { return topTexts[i] === t; }),
+      '一级项目依次为：明确问题、AI工具、核对结果',
+      tipTop
+    ));
+
+    // 5. 「AI工具」下有两个子项目：对话助手、工具型助手
+    const parent = topItems.find(function (i) { return norm(i.text) === 'ai工具'; });
+    let okSub = false;
+    let tipSub = '';
+    if (!parent) {
+      tipSub = '先写出一级项目「AI工具」。';
+    } else {
+      const kids = flatItems(parent.children);
+      if (!kids.length) {
+        tipSub = '「AI工具」下面还没有子项目：在下一行缩进 2 个空格，再写 - 对话助手。';
+      } else {
+        const kt = kids.map(function (i) { return norm(i.text); });
+        okSub = kids.length === 2 && kt[0] === '对话助手' && kt[1] === '工具型助手' &&
+          kids.every(function (i) { return !i.children.length; });
+        if (!okSub) {
+          tipSub = '「AI工具」的子项目应为：对话助手、工具型助手（共 2 个，不再有下一级）；目前是：' +
+            kids.map(function (i) { return plainText(i.text); }).join('、') + '。';
+        }
+      }
+    }
+    checks.push(check(okSub, '「AI工具」下有两个子项目：对话助手、工具型助手', tipSub));
+
+    // 6. 「明确问题」和「核对结果」没有子项目
+    const others = topItems.filter(function (i) {
+      const n = norm(i.text);
+      return n === '明确问题' || n === '核对结果';
+    });
+    let tipOth = '';
+    if (!topItems.length) tipOth = '先写出列表。';
+    else if (others.length < 2) tipOth = '缺少一级项目「明确问题」或「核对结果」。';
+    else tipOth = '“明确问题”和“核对结果”下面不应该有子项目，请删除或取消缩进。';
+    checks.push(check(
+      others.length === 2 && others.every(function (i) { return !i.children.length; }),
+      '「明确问题」和「核对结果」没有子项目',
+      tipOth
+    ));
+
+    // 7. 没有无关内容（多个被拆开的列表由第 2、3 项报告，这里只检查非列表块）
+    const extras = blocks.filter(function (b) { return b.type !== 'ul' && b.type !== 'ol'; });
+    checks.push(check(
+      topLists.length > 0 && extras.length === 0,
+      '没有无关内容（只需要这一个列表）',
+      extras.length ? '发现与本关无关的内容：' + blockNames(extras) + '。请删除。' : '还没有可检查的列表。'
+    ));
+
+    return checks;
+  }
+
+    function judgeTable(text, blocks) {
+    const lines = text.split(/\r?\n/);
+    const checks = [];
+    const t = blocks.find(function (b) { return b.type === 'table'; });
+    const pipeLines = lines.filter(function (l) { return l.indexOf('|') >= 0; });
+
+    let tip = '';
+    if (!t) {
+      if (!pipeLines.length) {
+        tip = '表格用竖线 | 分隔单元格，例如：| 语法 | 符号 | 示例 |';
+      } else {
+        const hasDelim = lines.some(function (l) { return l.indexOf('|') >= 0 && RE.tableDelim.test(l); });
+        tip = hasDelim
+          ? '表头与分隔行的列数不一致。表头有几列，分隔行就要有几组 ---（3 列写 | --- | --- | --- |）。'
+          : '缺少「分隔行」：表头下一行必须写 | --- | --- | --- |，否则不会渲染成表格。';
+      }
+    }
+    checks.push(check(!!t, '写出带分隔行的表格结构', tip));
+
+    const HEAD = ['语法', '符号', '示例'];
+    let tipH = '';
+    if (!t) tipH = '先完成表格结构。';
+    else if (t.header.length !== 3) tipH = '表格需要 3 列，目前是 ' + t.header.length + ' 列。';
+    else tipH = '表头应依次为：语法 | 符号 | 示例；目前是：' + t.header.map(plainText).join(' | ') + '。';
+    checks.push(check(
+      t && t.header.length === 3 && HEAD.every(function (h, i) { return norm(t.header[i]) === h; }),
+      '表头为 3 列：语法、符号、示例',
+      tipH
+    ));
+
+    const rows = t ? t.rows : [];
+    checks.push(check(
+      rows.length >= 2,
+      '至少有 2 行数据',
+      !t ? '先完成表格结构。' : '目前只有 ' + rows.length + ' 行数据，请再添加。'
+    ));
+
+    const bad = rows.findIndex(function (r) { return r.length !== 3; });
+    let tipR = '';
+    if (!t) tipR = '先完成表格结构。';
+    else if (!rows.length) tipR = '先添加数据行。';
+    else if (bad >= 0) tipR = '第 ' + (bad + 1) + ' 行数据有 ' + rows[bad].length + ' 个单元格，应为 3 个。检查单元格之间是否都有 | 分隔。';
+    checks.push(check(!!t && rows.length > 0 && bad < 0, '每一行数据恰好有 3 个单元格', tipR));
+
+    let emptyPos = null;
+    rows.forEach(function (r, ri) {
+      for (let c = 0; c < 3; c++) {
+        if (!emptyPos && !plainText(r[c] || '')) emptyPos = [ri + 1, c + 1];
+      }
+    });
+    checks.push(check(
+      !!t && rows.length > 0 && !emptyPos,
+      '所有数据单元格都有内容',
+      emptyPos ? '第 ' + emptyPos[0] + ' 行第 ' + emptyPos[1] + ' 列是空的，请填写内容。' : '先添加数据行。'
+    ));
+
+    const r0 = rows[0];
+    const r1 = rows[1];
+    const okFirst = !!(r0 && r1) && norm(r0[0] || '') === '标题' && norm(r1[0] || '') === '列表';
+    checks.push(check(
+      okFirst,
+      '第一行数据的“语法”是「标题」，第二行是「列表」',
+      '第 1 列需要依次写“标题”“列表”；目前是：' +
+        (r0 ? plainText(r0[0] || '') || '（空）' : '（无）') + '、' +
+        (r1 ? plainText(r1[0] || '') || '（空）' : '（无）') + '。'
+    ));
+
+    const okSym = !!(r0 && r1) && plainText(r0[1] || '').indexOf('#') >= 0 && /[-*+]/.test(plainText(r1[1] || ''));
+    checks.push(check(
+      okSym,
+      '“符号”列：「标题」行写 #，「列表」行写 - 、* 或 +',
+      '第 2 列：标题对应的符号是 #，无序列表对应的符号是 - （也可以是 * 或 +）。'
+    ));
+
+    const extras = blocks.filter(function (b) { return b.type !== 'table'; });
+    checks.push(check(
+      blocks.length === 1 && !!t,
+      '没有无关内容（只需要这一张表格）',
+      extras.length ? '发现与本关无关的内容：' + blockNames(extras) + '。请删除。' : '还没有可检查的表格。'
+    ));
+    return checks;
+  }
+
+
+  // V0.3 新知识点判题：在解析后的结构上验证，语法正确而观点不同不会扣分。
+  function onlyType(blocks, type, count) {
+    return blocks.length === count && blocks.every(function (b) { return b.type === type; });
+  }
+  function genericStructure(blocks, type, name) {
+    return check(blocks.some(function (b) { return b.type === type; }), '使用'+name+'的 Markdown 结构', '请按照本关要求写出'+name+'，并对照右侧预览。');
+  }
+  function noOtherBlocks(blocks, wanted) {
+    const extra = blocks.filter(function (b) { return wanted.indexOf(b.type) < 0; });
+    return check(extra.length === 0, '没有无关的块级内容', extra.length ? '请删掉本关不要求的内容：'+blockNames(extra) : '');
+  }
+  function judgeBold(text, blocks) {
+    const ps = blocks.filter(function (b) { return b.type === 'paragraph'; });
+    const html = ps.map(function (p) { return renderInline(p.text); }).join('');
+    const values = Array.from(html.matchAll(/<strong>([\s\S]*?)<\/strong>/g)).map(function (x) { return norm(x[1].replace(/<[^>]*>/g, '')); });
+    return [genericStructure(blocks,'paragraph','正文段落'),
+      check(values.includes(norm('核对结果')), '「核对结果」已加粗', '使用 **核对结果** 或 __核对结果__。'),
+      check(values.includes(norm('保护隐私')), '「保护隐私」已加粗', '使用 **保护隐私** 或 __保护隐私__。'),
+      check(onlyType(blocks,'paragraph',1) && values.length === 2 && norm(ps[0].text)===norm('使用AI时，先核对结果，再注意保护隐私。'), '正文内容与两个加粗重点都正确', '合并为一段「使用AI时，先核对结果，再注意保护隐私。」，只加粗指定两个词语。')];
+  }
+  function judgeParagraphs(text, blocks) {
+    const ps = blocks.filter(function (b) { return b.type === 'paragraph'; });
+    const want=['第一次尝试要有记录。','遇到问题先观察。','再检查实际结果。'];
+    const second=ps[1] ? ps[1].text : '';
+    const parts=second.split(/(?: {2,}|\\)\n/);
+    return [check(ps.length===2, '写出两个独立段落（用空行分隔）', '第一段与第二段之间要空一行。'),
+      check(ps[0] && norm(ps[0].text)===norm(want[0]), '第一段内容正确', '第一段写：'+want[0]),
+      check(ps[1] && parts.length===2 && parts.every(function (x,i) { return norm(x)===norm(want[i+1]); }), '第二段使用了硬换行', '在「遇到问题先观察。」行末加入两个半角空格或反斜杠，再换行输入第三句。'),
+      check(onlyType(blocks,'paragraph',2),'没有多余块级内容','本关只需两段正文。')];
+  }
+  function judgeQuotes(text,blocks) {
+    const out=[];
+    let cur=blocks[0];
+    for(let depth=1;depth<=3;depth++) {
+      if(!cur||cur.type!=='blockquote')break;
+      const para=cur.children.filter(function(b){return b.type==='paragraph';});
+      const nested=cur.children.filter(function(b){return b.type==='blockquote';});
+      out.push({texts:para.map(function(p){return norm(p.text);}),nested:nested.length,all:cur.children.length});
+      cur=nested[0];
+    }
+    const terms=['观察到的事实','AI 的建议','准备核验的问题'];
+    return [genericStructure(blocks,'blockquote','引用'),
+      check(out.length===3,'引用有一级、二级、三级三个层次','在每层前分别输入 >、> >、> > >。'),
+      check(out.length===3 && out.every(function(o,i){return o.texts.length===1 && o.texts[0]===norm(terms[i]);}), '每一层引用内容符合任务','请使用「观察到的事实」「AI 的建议」「准备核验的问题」，各占一个引用层级。'),
+      check(onlyType(blocks,'blockquote',1) && out.length===3 && out.every(function(o,i){return o.all===(i<2?2:1);}), '只有这一组三级引用','删除多余的引用或普通段落。')];
+  }
+  function judgeOrdered(text,blocks) {
+    const ol=blocks[0];
+    const its=ol&&ol.type==='ol'?ol.items:[];
+    const texts=its.map(function(i){return norm(i.text);});
+    const kids=its[1]?its[1].children:[];
+    const sub=kids.length===1 && kids[0].type==='ol' ? kids[0].items:[];
+    return [genericStructure(blocks,'ol','有序列表'),
+      check(texts.length===3 && ['说明目标','分成小步骤','检查结果'].every(function(t,i){return texts[i]===norm(t);}), '三个主步骤正确','按顺序列出：说明目标、分成小步骤、检查结果。'),
+      check(sub.length===2 && norm(sub[0].text)===norm('先试一次') && norm(sub[1].text)===norm('记录反馈'),'第二步下有两个有序子步骤','「分成小步骤」下面缩进3格再写 1. 先试一次 和 2. 记录反馈。'),
+      check(its.length===3 && its.every(function(it,i){return i===1 ? it.children.length===1 : it.children.length===0;}) && blocks.length===1,'只有一份完整的有序列表','请检查是否混用有序、无序标记，或添加了多余段落。')];
+  }
+  function judgeAlignment(text,blocks) {
+    const t=blocks.find(function(b){return b.type==='table';});
+    return [genericStructure(blocks,'table','表格'),
+      check(t && t.header.length===3 && ['指标','当前','目标'].every(function(s,i){return norm(t.header[i])===norm(s);}), '表头三列：指标、当前、目标','按顺序写 | 指标 | 当前 | 目标 |。'),
+      check(t && JSON.stringify(t.align)===JSON.stringify(['left','center','right']), '左、中、右三种对齐正确','分隔行应写 | :--- | :---: | ---: |，冒号决定对齐方式。'),
+      check(t && t.rows.length===1 && t.rows[0].length===3 && ['练习次数','2','5'].every(function(s,i){return norm(t.rows[0][i])===norm(s);}), '填写一行完整数据：练习次数、2、5','表格数据行写 | 练习次数 | 2 | 5 |。'),
+      check(onlyType(blocks,'table',1),'没有多余内容','本关只需这一张表格。')];
+  }
+  function judgeCells(text,blocks) {
+    const t=blocks.find(function(b){return b.type==='table';});
+    const rows=t?t.rows:[];
+    const cell=function(i){return rows[i]&&rows[i].length===3?rows[i][1]:'';};
+    const h0=renderInline(cell(0)), h1=renderInline(cell(1)), h2=renderInline(cell(2));
+    return [genericStructure(blocks,'table','表格'),
+      check(t&&t.header.length===3&&['类型','示例','说明'].every(function(s,i){return norm(t.header[i])===norm(s);}), '表头是：类型、示例、说明','表头使用 | 类型 | 示例 | 说明 |。'),
+      check(rows.length===3 && rows.every(function(r){return r.length===3 && r.every(function(c){return !!c.trim();});}) && ['重点','命令','资源'].every(function(s,i){return norm(rows[i][0])===norm(s);}), '三行数据结构完整','三行的首列依次为：重点、命令、资源，且每格都有内容。'),
+      check(/<strong>\s*核验\s*<\/strong>/.test(h0),'重点行使用加粗语法','第1行示例单元格写 **核验**。'),
+      check(/<code>\s*npm test\s*<\/code>/.test(h1),'命令行使用行内代码','第2行示例单元格写 `npm test`。'),
+      check(/<a href="https:\/\/[^\"]+"[^>]*>\s*参考文档\s*<\/a>/.test(h2),'资源行含有有效的 HTTPS 链接','第3行示例单元格写 [参考文档](https://www.mdput.com)。'),
+      check(onlyType(blocks,'table',1),'没有多余段落或列表','本关只要这张表格。')];
+  }
+  function judgeDivider(text,blocks) {
+    const types=blocks.map(function(b){return b.type;});
+    return [check(types.includes('hr'),'写出独立的 Markdown 分隔线','在分隔线前后各留空行，可用 ---、*** 或 ___。'),
+      check(types.join(',')==='heading,paragraph,hr,heading,paragraph','结构顺序是标题→正文→分隔线→标题→正文','注意 --- 紧贴段落可能被当成二级标题，建议前后留空行。'),
+      check(blocks[0]&&blocks[0].level===2&&norm(blocks[0].text)===norm('已知事实')&&blocks[3]&&blocks[3].level===2&&norm(blocks[3].text)===norm('下一步'),'两个二级标题正确','依次写 ## 已知事实 和 ## 下一步。'),
+      check(blocks[1]&&norm(blocks[1].text)===norm('资料需要核验。')&&blocks[4]&&norm(blocks[4].text)===norm('记录验证结果。'),'两段说明文字正确','标题下分别写「资料需要核验。」和「记录验证结果。」。')];
+  }
+  function judgeTasks(text,blocks) {
+    const u=blocks[0]&&blocks[0].type==='ul'?blocks[0]:null;
+    const items=u?u.items:[];
+    const expect=['写出问题','试运行一次','检查最终结果'];
+    const matched=items.map(function(it){return /^\[([ xX])\][ \t]+(.+)$/.exec(it.text);});
+    return [genericStructure(blocks,'ul','任务列表'),
+      check(items.length===3 && matched.every(Boolean),'三项都使用 [x] 或 [ ] 任务框','每行以 - [x] 或 - [ ] 开头，其中方括号内部必须有 x 或空格。'),
+      check(matched.length===3 && matched.every(function(m,i){return m&&norm(m[2])===norm(expect[i]);}), '任务内容和顺序正确','依次写「写出问题」「试运行一次」「检查最终结果」。'),
+      check(matched.length===3 && matched.every(function(m,i){return m && (i<2?/[xX]/.test(m[1]):m[1]===' ');}), '前两项已完成、第三项待办','前两项使用 [x]，最后一项使用 [ ]。'),
+      check(onlyType(blocks,'ul',1)&&items.every(function(it){return !it.children.length;}),'没有多余内容或子项','本关只需要三个一级任务项。')];
+  }
+  function judgeDefinitions(text,blocks) {
+    const ds=blocks.filter(function(b){return b.type==='definition';});
+    const items=ds.reduce(function(a,b){return a.concat(b.items);},[]);
+    const terms=['模型','工具'];
+    return [genericStructure(blocks,'definition','定义列表'),
+      check(items.length===2 && items.every(function(it,i){return norm(it.term)===norm(terms[i]);}),'有「模型」「工具」两个术语','每个术语单独一行，下一行用「: 空格 解释」。'),
+      check(items.length===2 && items[0].defs.length===1 && items[1].defs.length===1 && items.every(function(it){return !!it.defs[0];}),'每个术语都有一条解释','每个术语下面紧跟一行「: 解释」，不要漏掉半角冒号和空格。'),
+      check(onlyType(blocks,'definition',1) && items.length===2, '只有一张两项定义列表','请检查是否加了额外正文、额外术语或其他标记。')];
+  }
+
+  function judge(lv, text) {
+    if (!text.trim()) {
+      return {
+        pass: false,
+        empty: true,
+        checks: [check(false, '输入框不能为空', '请先在左侧输入 Markdown 内容，再提交答案。')]
+      };
+    }
+    let checks;
+    try {
+      checks = lv.judge(text, parseMarkdown(text));
+    } catch (e) {
+      checks = [check(false, '判题时出现异常', '请检查输入内容后重试。')];
+    }
+    return {
+      pass: checks.every(function (c) { return c.ok; }),
+      empty: false,
+      checks: checks
+    };
+  }
+
+  /* =====================================================
+   * 三、关卡数据
+   * ===================================================== */
+  const LEVELS = [
+    {
+      id: 1,
+      kp: '标题',
+      icon: '#',
+      short: '用 # 写出三层标题结构',
+      title: '标题闯关：搭一份笔记骨架',
+      desc: '你正在整理 AI 研学社的学习笔记。请用 Markdown 写出三个层级清晰的标题。',
+      reqs: [
+        '一级标题：Markdown 学习笔记',
+        '二级标题：基础语法',
+        '三级标题：标题',
+        '按以上顺序，只写这三行标题，不要添加其他内容'
+      ],
+      hints: [
+        'Markdown 用 # 表示标题，# 的数量就是标题级别：一个 # 是一级，两个 ## 是二级。',
+        '# 和文字之间必须有一个空格；没有空格的写法不会被识别为标题。',
+        '结构提示：第一行 1 个 #，第二行 2 个 #，第三行 3 个 #，每个 # 后接空格再写文字。'
+      ],
+      judge: judgeHeadings
+    },
+    {
+      id: 2,
+      kp: '无序列表',
+      icon: '•',
+      short: 'AI 新手的三件装备 · 用多级列表整理',
+      title: 'AI 新手的三件装备',
+      desc: '把一张 AI 学习清单排成多级无序列表。这一关只检查 Markdown 结构与指定文字，不要求你赞同某种学习观点。',
+      reqs: [
+        '3 个一级项目，依次为：明确问题、AI工具、核对结果',
+        '在「AI工具」下面添加 2 个子项目：对话助手、工具型助手',
+        '同一层级统一使用 -、* 或 +；不同层级可以使用不同符号',
+        '「明确问题」和「核对结果」下面不要有子项目'
+      ],
+      hints: [
+        '无序列表每行以 -、* 或 + 开头，标记后面要加一个半角空格。',
+        '子项目的标记需要缩进到父项目的内容列。这里推荐子项缩进 2 个空格。',
+        '结构提示：写三个一级项目，在第 2 项「AI工具」下面紧跟两行子项，分别是「对话助手」「工具型助手」。'
+      ],
+      judge: judgeUl
+    },
+    {
+      id: 3,
+      kp: '基本表格',
+      icon: '▦',
+      short: '用 | 和 --- 做一张速查表',
+      title: '基本表格闯关：语法速查表',
+      desc: '请制作一张简单的 Markdown 语法速查表。',
+      reqs: [
+        '表格共 3 列，表头依次为：语法、符号、示例',
+        '至少 2 行数据：第 1 行“语法”为 标题，符号写 #；第 2 行“语法”为 列表，符号写 - （或 * 、+）',
+        '“示例”列由你自己填写，不能为空',
+        '表头下面必须有分隔行，并且只需要这一张表格'
+      ],
+      hints: [
+        '表格用竖线 | 分隔列，第一行是表头。',
+        '表头下一行必须有分隔行，每列用 --- 表示，例如：| --- | --- | --- |',
+        '每一行的单元格数量要和表头一致：3 列就是 3 段内容，用 | 隔开。'
+      ],
+      judge: judgeTable
+    }
+    ,{
+      id: 4, kp:'加粗样式',icon:'B',short:'突出核验结果与隐私保护',
+      title:'加粗闯关：把重点标记出来',
+      desc:'用一个 Markdown 段落写一条提醒，并加粗两个关键词；它是一种排版练习，不要求赞同某种观点。',
+      reqs:['只写一个段落：「使用AI时，先核对结果，再注意保护隐私。」','把「核对结果」和「保护隐私」分别加粗','可使用 **加粗** 或 __加粗__；不要多加粗其他文字'],
+      hints:['两个星号包住文字就是 **加粗**。','也可以使用两个下划线：__加粗__。','参考结构：使用AI时，先**核对结果**，再注意**保护隐私**。'],
+      judge:judgeBold
+    },{
+      id: 5,kp:'段落与换行',icon:'↵',short:'用空行和硬换行记录一次复盘',
+      title:'段落闯关：让复盘更易读',desc:'区分空行产生的新段落和同一段落中的硬换行。',
+      reqs:['第一段写「第一次尝试要有记录。」','空一行开始第二段，第一行写「遇到问题先观察。」','第二段下一行写「再检查实际结果。」；用行末两个空格或行末反斜杠实现硬换行'],
+      hints:['两个段落之间至少有一个空白行。','硬换行：行末加入两个半角空格，再按 Enter。','也可以在行末写反斜杠 \\ 再按 Enter，预览应当实际断行。'],
+      judge:judgeParagraphs
+    },{
+      id: 6,kp:'一二三级引用',icon:'❞',short:'给事实、建议与问题搭三级引用',
+      title:'引用闯关：区分声音与层次',desc:'用嵌套引用整理三层不同的信息，不用判断内容观点的对错。',
+      reqs:['一级引用：「观察到的事实」','其下二级引用：「AI 的建议」','其下三级引用：「准备核验的问题」','整个作品只保留这一组引用'],
+      hints:['引用每行用 > 空格 开头。','二级引用写 > > 文字；三级引用写 > > > 文字。','三行依次是：> 观察到的事实 / > > AI 的建议 / > > > 准备核验的问题。'],
+      judge:judgeQuotes
+    },{
+      id: 7,kp:'有序列表',icon:'1.',short:'把一个任务安排成可执行步骤',
+      title:'有序列表闯关：小任务拆解',desc:'把一件事拆成有顺序的大步骤，并为第二步加入两个子步骤。',
+      reqs:['三个主步骤按顺序：说明目标、分成小步骤、检查结果','在第二项下面缩进添加两个有序子步骤：先试一次、记录反馈','主列表和子列表都用数字加英文句点 . 或英文右括号 )，不要混入无序标记'],
+      hints:['有序列表用 1. 项目、2. 项目 等写法。','子步骤要缩进到父项内容列，1. 后通常缩进 3 个空格。','示例：2. 分成小步骤，下一行用3个空格后写 1. 先试一次。'],
+      judge:judgeOrdered
+    },{
+      id: 8,kp:'对齐方式',icon:'⇔',short:'表格三列分别左、中、右对齐',
+      title:'对齐闯关：把数据摆得清楚',desc:'练习用分隔行冒号控制三列对齐方式。',
+      reqs:['表头：指标、当前、目标','第一列左对齐、第二列居中、第三列右对齐','数据行：练习次数、2、5；只需要这张表'],
+      hints:['左对齐 :---，居中 :---:，右对齐 ---:。','对齐符号在表头下一行，而不是数据行。','试试：| :--- | :---: | ---: |。'],
+      judge:judgeAlignment
+    },{
+      id: 9,kp:'单元格内嵌',icon:'⌗',short:'在表格单元格中放加粗、代码和链接',
+      title:'单元格闯关：微型资源导航',desc:'同一张表里同时练习行内强调、行内代码和链接。',
+      reqs:['表头：类型、示例、说明；三行首列依次是：重点、命令、资源','「重点」的示例单元格使用 **核验**','「命令」的示例单元格写行内代码 `npm test`','「资源」的示例单元格是标题为「参考文档」的 HTTPS 链接','每格填入内容，说明列可自行编写'],
+      hints:['表格一列里也可以用 **文字** 加粗。','反引号 `包围代码`；链接格式为 [标题](https://网址)。','参考链接：[参考文档](https://www.mdput.com)，说明列自拟即可。'],
+      judge:judgeCells
+    },{
+      id: 10,kp:'分隔线',icon:'―',short:'用横线区分已知事实与下一步',
+      title:'分隔线闯关：信息分区',desc:'给一份简短说明划分两个区域，保持清晰层级。',
+      reqs:['二级标题 ## 已知事实，下面写「资料需要核验。」','空一行，写一条 Markdown 分隔线','再空一行，二级标题 ## 下一步，下面写「记录验证结果。」','可用 ---、*** 或 ___，注意要成为独立分隔线'],
+      hints:['三个或更多 -、* 或 _ 单独一行可以形成分隔线。','为了避免 --- 被解释成标题下划线，建议前后各空一行。','结构：## 已知事实 / 正文 / 空行 / --- / 空行 / ## 下一步 / 正文。'],
+      judge:judgeDivider
+    },{
+      id: 11,kp:'任务列表',icon:'☑',short:'用复选框记录完成与待办',
+      title:'任务列表闯关：核验清单',desc:'整理一份完成情况明确的小清单。',
+      reqs:['使用三个无序任务项，依次是：写出问题、试运行一次、检查最终结果','前两项标记为完成 [x]，最后一项标记为待办 [ ]','预览应出现两个勾选框和一个空勾选框'],
+      hints:['任务列表由无序项和方括号组成，例如 - [x] 已完成。','未完成的项目用 - [ ]，方括号里要有半角空格。','输入：- [x] 写出问题；- [x] 试运行一次；- [ ] 检查最终结果，各占一行。'],
+      judge:judgeTasks
+    },{
+      id: 12,kp:'定义列表',icon:'≔',short:'用术语和解释建一个小词典',
+      title:'定义列表闯关：两张术语卡',desc:'练习本网站支持的「术语 + 下一行 : 解释」扩展写法。它不属于所有 Markdown 编辑器的默认语法。',
+      reqs:['术语1「模型」，下一行以半角冒号加空格开头，写一条解释','术语2「工具」，下一行同样用 : 解释','两个定义的解释内容由你自己填写，不按观点判断对错','这是扩展语法，在其他渲染器中效果可能不同'],
+      hints:['定义列表扩展写法：术语单独一行，下一行输入 : 解释。','冒号应使用英文半角 :，后跟空格。','例子：模型 换行 : 用于生成或分析内容。再空一行写 工具 换行 : 执行具体操作。'],
+      judge:judgeDefinitions
+    }
+  ];
+
+  const KP = [
+    '标题', '加粗样式', '段落与换行', '一二三级引用', '有序列表', '无序列表',
+    '基本表格', '对齐方式', '单元格内嵌', '分隔线', '任务列表', '定义列表'
+  ];
+  // 固定旧版存储 ID：1=标题、2=无序列表、3=基本表格；UI 另用课程顺序呈现。
+  const ORDERED_LEVELS = KP.map(function (name) { return LEVELS.find(function (l) { return l.kp === name; }); });
+  function levelNo(id) { return ORDERED_LEVELS.findIndex(function (l) { return l.id === id; }) + 1; }
+  function nextCourseLevel(id) { return ORDERED_LEVELS[levelNo(id)] || null; }
+  function closeLevels(id) {
+    const idx = levelNo(id) - 1;
+    return ORDERED_LEVELS.slice(Math.max(0, idx - 1), Math.min(ORDERED_LEVELS.length,idx + 2));
+  }
+  function playTabsHtml() {
+    return closeLevels(S.lv.id).map(function(l) {
+      const p = progress.levels[l.id];
+      return '<button class="tab ' + (l.id===S.lv.id?'active':'') + '" data-action="openLevel" data-level="'+l.id+'">'+
+        levelNo(l.id)+' · '+escapeHtml(l.kp)+(p&&(p.passed||p.practiced)?' ✓':'')+'</button>';
+    }).join('');
+  }
+
+  /* =====================================================
+   * 四、进度
+   * ===================================================== */
+  function loadProgress() {
+    const d = Store.load();
+    const out = { levels: {}, discoveries: {} };
+    if (d && d.discoveries && typeof d.discoveries==='object') {
+      Object.keys(d.discoveries).forEach(function(key){
+        const c=d.discoveries[key];
+        if(c && typeof c==='object')out.discoveries[key]={saved:!!c.saved,note:String(c.note||'').slice(0,240)};
+      });
+    }
+    if (d && d.levels && typeof d.levels === 'object') {
+      LEVELS.forEach(function (l) {
+        const x = d.levels[l.id];
+        if (x && typeof x === 'object') {
+          // 与 V0.1.1 共用存储键，旧挑战成绩原样继承；practiced 是 V0.2 新增字段。
+          out.levels[l.id] = {
+            attempts: parseInt(x.attempts, 10) || 0,
+            best: parseInt(x.best, 10) || 0,
+            stars: Math.min(3, parseInt(x.stars, 10) || 0),
+            passed: !!x.passed,
+            practiced: !!x.practiced
+          };
+        }
+      });
+    }
+    return out;
+  }
+
+  let progress = loadProgress();
+
+  /* =====================================================
+   * 五、首页
+   * ===================================================== */
+  function updateStickyHeader() {
+    const compact = !$('#playView').hidden && window.scrollY > 160;
+    $('#playView .play-top').classList.toggle('is-condensed', compact);
+  }
+  window.addEventListener('scroll', updateStickyHeader, { passive: true });
+
+  function showView(v) {
+    $('#homeView').hidden = v !== 'home';
+    $('#playView').hidden = v !== 'play';
+    window.scrollTo(0, 0);
+    updateStickyHeader();
+  }
+
+  // 本次浏览时的选择；刷新后默认自由练习，不修改已有挑战成绩。
+  let selectedMode = 'practice';
+  function modeTitle(m) { return m === 'challenge' ? '限时挑战' : '自由练习'; }
+
+
+  const KNOWLEDGE = [
+    {id:1,key:'structure',title:'结构可以帮人更快找到重点',lead:'一份笔记不一定越长越好；标题层级能让读者快速定位所需信息。',more:'回看自己收藏的一篇长文：它的标题是否能让你只看目录就理解结构？'},
+    {id:4,key:'emphasis',title:'强调少一点，重点才更清楚',lead:'粗体适合提示关键信息。如果每句话都加粗，反而更难区分优先级。',more:'挑出自己下一份笔记真正重要的两个词，而不是把整段都标亮。'},
+    {id:5,key:'review',title:'记录过程比只记结果更容易复盘',lead:'学习新工具时，保留尝试过什么、出现了什么结果，能帮助下一次更快定位问题。',more:'为一次小实验写三句话：目标、实际结果、下一次改进。'},
+    {id:6,key:'sources',title:'别人说的和自己确认的要分开',lead:'引用可以清楚标明信息来自哪里；他人的建议、自己的观察和待验证问题并不是同一种东西。',more:'下次看一条 AI 建议时，区分建议内容和可以观察的证据。'},
+    {id:7,key:'steps',title:'大任务通常能拆成可验证的小步骤',lead:'遇到复杂任务，不一定需要一次做完。先做最小的一步，再检查结果，往往更容易发现偏差。',more:'把一个想做的任务改写成三个可以逐项勾选的小行动。'},
+    {id:2,key:'ai_tools',title:'会回答，不等于能执行',lead:'模型能分析和生成内容，但能否读写文件、运行代码或访问服务，还取决于工具接口、运行环境和权限。',more:'AI 说“网页改好了”后，怎样通过打开网页、点按钮和查看结果来确认？'},
+    {id:3,key:'tables',title:'对比时先统一比较维度',lead:'表格能够把同一类信息摆在一起。不过如果比较对象的条件不同，表格再整齐也不能自动得出公平结论。',more:'比较两种工具时，可以先固定同一任务和同一个验收标准。'},
+    {id:8,key:'presentation',title:'排版会影响阅读，但不会改变事实',lead:'对齐方式能帮助读者扫视数据。呈现得整齐很有用，但重要结论仍需真实依据。',more:'试着把数字靠右展示，再看看是否更容易横向比较。'},
+    {id:9,key:'links',title:'点击链接前先看来源',lead:'Markdown 链接的显示文字和实际地址可以不同。遇到陌生资源，留意链接去向、权限要求和信息来源。',more:'在自己的资源表里给每个链接写一句“为何值得保存”。'},
+    {id:10,key:'boundaries',title:'事实、猜测和计划最好分区记录',lead:'一句“我认为”不等于一项已经验证的事实。把不同类型的信息分开，能减少日后回看时的混淆。',more:'在笔记中试着分成“已知”“推测”“待验证”三个小区。'},
+    {id:11,key:'verification',title:'完成按钮不是最终证据',lead:'任务打勾代表某个步骤已做，但是否真正成功，还要看运行结果、文件内容或其他可观察反馈。',more:'给自己的下一个小项目增加一项“打开成果并检查”。'},
+    {id:12,key:'terms',title:'听懂术语不等于掌握能力',lead:'知道 Agent、模型或 Harness 这些名称，可以帮助沟通；是否会用，仍要靠实际操作和验证。',more:'选一个陌生概念，先写出你的理解，再找可运行的小例子核对。'}
+  ];
+  let activeCardId=2;
+  let cardDraft='';
+  function knowledgeItem(id) { return KNOWLEDGE.find(function (x) { return x.id === id; }); }
+  function isKnowledgeUnlocked(id) {
+    const p=progress.levels[id];
+    return !!(p&&(p.practiced||p.passed)) || !!(S&&S.lv.id===id&&S.finished&&S.result&&S.result.passed);
+  }
+  function isKnowledgeSaved(id) {
+    const c=progress.discoveries||{};
+    return id ? !!(c[knowledgeItem(id).key]&&c[knowledgeItem(id).key].saved) : KNOWLEDGE.some(function(k){return !!(c[k.key]&&c[k.key].saved);});
+  }
+  function knowledgeSavedCount() { return KNOWLEDGE.filter(function(k){return isKnowledgeSaved(k.id);}).length; }
+  function knowledgeMarkdown() {
+    const selected=KNOWLEDGE.filter(function(k){return isKnowledgeSaved(k.id);});
+    const body=selected.map(function(k){
+      const c=progress.discoveries[k.key]||{};
+      return '## 知识卡 '+String(levelNo(k.id)).padStart(2,'0')+'：'+k.title+'\n\n'+k.lead+'\n\n**继续思考：**'+k.more+'\n\n### 我的提醒\n\n'+(String(c.note||'').trim()||'（尚未记录）')+'\n';
+    }).join('\n---\n\n');
+    return '# 我的 AI 时代学习手册\n\n这份手册由学习者自行选择知识卡与填写提醒；知识卡只提供入门信息，不替代独立核验。\n\n'+body+'\n---\n\n工具设计与制作：Vansinver · © 2026 Vansinver。\n\n个人提醒由手册使用者撰写，归其本人管理。\n';
+  }
+  function downloadKnowledge() {
+    if (!knowledgeSavedCount()) return;
+    const blob=new Blob([knowledgeMarkdown()],{type:'text/markdown;charset=utf-8'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='我的AI时代学习手册.md';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
+  }
+  function saveKnowledge() {
+    const k=knowledgeItem(activeCardId);
+    progress=loadProgress();
+    progress.discoveries[k.key]={saved:true,note:cardDraft.slice(0,240)};
+    Store.save(progress);
+    openModal({title:'📚 已加入我的手册',
+      html:'<p>这张知识卡及你的个人提醒已保存在本浏览器；它不参与语法评分。</p><p class="kcard-note">当前收藏 '+knowledgeSavedCount()+' / 12 张知识卡。</p>',
+      actions:[{label:'⬇ 下载 Markdown 手册',cls:'primary',onClick:downloadKnowledge},
+        {label:'返回知识卡',cls:'soft',onClick:function(){openKnowledgeCard(activeCardId);}},
+        {label:'继续闯关',cls:'ghost'}]
+    });
+  }
+  function openHarnessCard() {
+    activeCardId=2;
+    openModal({title:'🔎 延伸探索 · Harness 是什么？',
+      html:'<p>Harness 并非某个唯一的技术标准；通常指围绕模型，组织工具调用、上下文、权限边界与结果验证等环节的执行框架。</p>'+ 
+        '<p>对初学者更重要的不是背名字，而是知道：模型回答问题和系统实际完成任务，需要验证的证据不同。</p>'+ 
+        '<p class="kcard-note">可选解释，不参与闯关分数。</p>',
+      actions:[{label:'← 返回知识卡',cls:'primary',onClick:function(){openKnowledgeCard(2);}}, {label:'继续练习',cls:'ghost'}]
+    });
+  }
+  function openKnowledgeCard(id) {
+    id=id||activeCardId||2;
+    progress=loadProgress();
+    if(!isKnowledgeUnlocked(id)) return;
+    activeCardId=id;
+    const k=knowledgeItem(id),c=progress.discoveries[k.key]||{};
+    cardDraft=String(c.note||'').slice(0,240);
+    const html='<p class="kcard-note">30秒知识卡 · 第'+levelNo(id)+'关解锁 · 自愿阅读，不考核观点</p>'+ 
+      '<div class="kcard-summary"><p><b>💡 '+escapeHtml(k.title)+'</b></p><p>'+escapeHtml(k.lead)+'</p>'+ 
+      '<p><b>想一想：</b>'+escapeHtml(k.more)+'</p></div>'+ 
+      '<label class="kcard-label" for="cardReflection">留给未来自己的一句提醒（可选）</label>'+ 
+      '<textarea id="cardReflection" class="card-reflection" maxlength="240" placeholder="可以写自己的理解，也可以留空。">'+escapeHtml(cardDraft)+'</textarea>'+ 
+      '<p class="kcard-note">点击收藏后保存到本地手册。无需认同卡片内容；支持自行修改提醒。</p>';
+    const actions=[{label:'📚 收藏到我的手册',cls:'primary',onClick:saveKnowledge}];
+    if(id===2)actions.push({label:'继续探索：Harness',cls:'soft',onClick:openHarnessCard});
+    actions.push({label:'继续闯关',cls:'ghost'});
+    openModal({title:'🔓 知识彩蛋 · '+k.title,html:html,actions:actions});
+  }
+
+  function renderHome() {
+    let stars = 0, challenged = 0, practiced = 0;
+    LEVELS.forEach(function (l) {
+      const p = progress.levels[l.id];
+      if (p) {
+        // 这里只呈现真实成长记录，不再将重复刷新的最佳分累计成首页总积分。
+        stars += p.stars;
+        if (p.passed) challenged++;
+        if (p.practiced) practiced++;
+      }
+    });
+    const currentDone = selectedMode === 'challenge' ? challenged : practiced;
+    const pct = Math.round(currentDone / KP.length * 100);
+    const choices =
+      '<div class="mode-choices" role="group" aria-label="选择训练模式">' +
+        '<button class="mode-choice ' + (selectedMode === 'practice' ? 'selected' : '') + '" data-action="selectMode" data-mode="practice" aria-pressed="' + (selectedMode === 'practice') + '">' +
+          '<span class="choice-icon">📖</span><strong>自由练习</strong><span class="mode-desc">不限时 · 免费提示 · 不扣分 · 记录练习完成</span>' +
+          '<span class="choice-state">' + (selectedMode === 'practice' ? '✓ 当前已选择' : '点击选择') + '</span></button>' +
+        '<button class="mode-choice ' + (selectedMode === 'challenge' ? 'selected' : '') + '" data-action="selectMode" data-mode="challenge" aria-pressed="' + (selectedMode === 'challenge') + '">' +
+          '<span class="choice-icon">⏱️</span><strong>限时挑战</strong><span class="mode-desc">每关 5 分钟 · 提示与错交扣分 · 赢取积分和星星</span>' +
+          '<span class="choice-state">' + (selectedMode === 'challenge' ? '✓ 当前已选择' : '点击选择') + '</span></button>' +
+      '</div>';
+
+    const cards = ORDERED_LEVELS.map(function (l) {
+      const p = progress.levels[l.id];
+      const complete = p && (selectedMode === 'challenge' ? p.passed : p.practiced);
+      const status = complete ? (selectedMode === 'challenge' ? '已通关' : '练习完成') : '待完成';
+      const detail = selectedMode === 'challenge'
+        ? '<span class="stars">' + starsHtml(p ? p.stars : 0) + '</span><span>' +
+          (p && p.best ? '最高 ' + p.best + ' 分' : '⏱ 限时 5 分钟') + '</span>'
+        : '<span>📖 不限时、不扣分</span><span>' + (complete ? '✓ 已掌握' : '开始练习 →') + '</span>';
+      return '<button class="level-card" data-action="openLevel" data-mode="' + selectedMode + '" data-level="' + l.id + '">' +
+        '<div class="lv-top"><span>第 ' + levelNo(l.id) + ' 关</span><span class="lv-state ' + (complete ? 'done' : '') + '">' + status + '</span></div>' +
+        '<div class="lv-icon">' + l.icon + '</div><h3>' + escapeHtml(l.kp) + '</h3><p>' + escapeHtml(l.short) + '</p>' +
+        '<div class="lv-bottom">' + detail + '</div></button>';
+    }).join('');
+
+    const chips = KP.map(function (name) {
+      const lv = LEVELS.find(function (l) { return l.kp === name; });
+      if (!lv) return '<span class="kp">🔒 ' + escapeHtml(name) + '</span>';
+      const p = progress.levels[lv.id];
+      const complete = p && (selectedMode === 'challenge' ? p.passed : p.practiced);
+      return '<span class="kp ' + (complete ? 'done' : 'open') + '">' + (complete ? '✅ ' : '▶ ') + escapeHtml(name) + '</span>';
+    }).join('');
+
+    $('#homeView').innerHTML =
+      '<div class="hero">' +
+        '<div class="brand-signature" aria-label="由 Vansinver 设计制作"><span class="brand-monogram">V</span><span class="brand-wordmark">Vansinver</span><span class="brand-byline">· 独立创作</span></div>' +
+        '<span class="hero-tag">洞见·AI 研学社 · Markdown 基础语法练习 · V0.3 · 12关完整版</span>' +
+        '<h1>Markdown 闯关实验室</h1>' +
+        '<p>12关现已开放。先自由练习，再限时挑战；同一关只保留最高纪录，不累计刷分。</p>' +
+        '<div class="stats">' +
+          '<div class="stat"><b>' + practiced + '/' + LEVELS.length + '</b><span>📖 自由练习完成</span></div>' +
+          '<div class="stat"><b>' + challenged + '/' + LEVELS.length + '</b><span>🏆 限时挑战通关</span></div>' +
+          '<div class="stat"><b>' + knowledgeSavedCount() + '</b><span>📚 已收藏知识卡</span></div>' +
+          '<div class="stat"><b>' + stars + '/' + (LEVELS.length * 3) + '</b><span>挑战星星</span></div>' +
+        '</div>' +
+        '<div class="progress-box"><div class="progress-row"><span>' + modeTitle(selectedMode) + ' · 12 个知识点进度</span><span>' + currentDone + '/' + KP.length + '（' + pct + '%）</span></div>' +
+        '<div class="bar"><i style="width:' + pct + '%"></i></div></div></div>' +
+      '<h2 class="section-title">🎮 选择训练模式</h2>' + choices +
+      '<h2 class="section-title">📚 ' + modeTitle(selectedMode) + ' · 选择关卡</h2>' +
+      '<p class="section-sub">下方关卡均使用当前选择的模式。' + (selectedMode === 'challenge' ? '重复挑战仅刷新本关最高分，不叠加积分。' : '自由练习不限时、不扣分。') + '</p>' +
+      '<div class="levels">' + cards + '</div>' +
+      '<h2 class="section-title">🗺️ 12 个知识点地图</h2>' +
+      '<p class="section-sub">12个知识点全部开放；定义列表采用本网站注明的扩展语法，不保证在所有编辑器中相同显示。</p>' +
+      '<div class="kp-grid">' + chips + '</div>' +
+      '<section class="knowledge-box"><h3>🧭 探索手册 · 可选知识彩蛋</h3>' +
+        '<p>每关解锁一个不同的轻量提醒。你可以只看一眼，也可以收藏、写下自己的理解；不评分观点。</p>' +
+        '<div class="knowledge-actions">' +
+          KNOWLEDGE.filter(function(k){return isKnowledgeUnlocked(k.id);}).map(function(k){return '<button class="btn soft" data-action="knowledgeCard" data-level="'+k.id+'">🔓 '+levelNo(k.id)+' · '+escapeHtml(k.title)+'</button>';}).join('') +
+          (knowledgeSavedCount()?'<button class="btn primary" data-action="downloadKnowledge">⬇ 导出我的手册（'+knowledgeSavedCount()+'张）</button>':'')+
+        '</div><p class="kcard-note">没有解锁的知识卡无需提前查看；观点没有标准答案。</p></section>' +
+      '<div class="note"><b>说明：</b>12 个知识点来自老师的预习任务；双模式、积分和星星是自主设计的学习工具，不是老师规定的考核。自由练习与挑战记录相互独立。</div>' +
+      '<div class="foot"><span>' +
+      (Store.persistent ? '💾 进度保存在当前网页来源的浏览器存储中；同一来源下会兼容 V0.1.1 挑战成绩' : '⚠️ 当前预览环境无法使用 localStorage，记录仅在本次页面有效') +
+      '</span><button class="btn ghost" data-action="resetAsk">重置全部进度</button></div>';
+  }
+
+  /* =====================================================
+   * 六、练习界面
+   * ===================================================== */
+  const editor = $('#editor');
+  const preview = $('#preview');
+  const timerEl = $('#timer');
+  let S = null;
+  let timerId = null;
+
+  function startLevel(id, mode, seedText) {
+    clearInterval(timerId);
+    const lv = LEVELS.find(function (l) { return l.id === id; });
+    if (!lv) return;
+    mode = mode === 'challenge' ? 'challenge' : 'practice';
+    selectedMode = mode;
+    S = {
+      lv: lv, mode: mode,
+      deadline: mode === 'challenge' ? Date.now() + TOTAL_SECONDS * 1000 : null,
+      remaining: mode === 'challenge' ? TOTAL_SECONDS : null,
+      finished: false, hintsUsed: 0, wrongs: 0, result: null
+    };
+    editor.value = seedText || '';
+    editor.readOnly = false;
+    $('#btnSubmit').disabled = false;
+    $('#btnRetry').textContent = mode === 'challenge' ? '🔄 重新挑战' : '🔄 重新练习';
+    renderPlay();
+    updatePreview();
+    updateTimer();
+    showView('play');
+    if (mode === 'challenge') timerId = setInterval(tick, 250);
+    try { editor.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+  }
+
+  function renderPlay() {
+    const lv = S.lv;
+    $('#modePill').textContent = S.mode === 'challenge' ? '⏱ 限时挑战' : '📖 自由练习';
+    $('#modePill').classList.toggle('is-practice', S.mode === 'practice');
+    $('#modeNotice').classList.toggle('practice', S.mode === 'practice');
+    $('#modeNotice').textContent = S.mode === 'challenge'
+      ? '限时模式：顶部计时器随页面滚动；错交后继续计时；提示扣10分，错误提交扣5分；正确后立即停表。'
+      : '自由练习：不限时间，所有提示免费，答错不扣分；通过后记录为「练习完成」，不产生积分和星星。';
+    $('#taskBadge').textContent = '第 ' + levelNo(lv.id) + ' 关 · ' + lv.kp;
+    $('#taskTitle').textContent = lv.title;
+    $('#taskDesc').textContent = lv.desc;
+    $('#taskReq').innerHTML = lv.reqs.map(function (r) { return '<li>' + escapeHtml(r) + '</li>'; }).join('');
+    $('#topicTeaser').hidden = lv.id !== 2;
+    if (lv.id === 2) $('#topicTeaser').textContent = '🔎 通关彩蛋：了解“对话助手”和“工具型助手”有什么不同。完全自选阅读，不影响成绩。';
+    $('#hintList').innerHTML = '';
+    $('#feedback').innerHTML = '';
+    $('#levelTabs').innerHTML = playTabsHtml();
+    updateMeta();
+    setPane('edit');
+  }
+
+  function currentBase() {
+    return Math.max(40, 100 - S.hintsUsed * 10 - S.wrongs * 5);
+  }
+
+  function updateMeta() {
+    if (!S) return;
+    const max = S.lv.hints.length;
+    $('#metaInfo').textContent = S.mode === 'challenge'
+      ? '提示 ' + S.hintsUsed + '/' + max + ' · 未通过 ' + S.wrongs + ' 次 · 当前基础分 ' + currentBase()
+      : '提示 ' + S.hintsUsed + '/' + max + ' · 已尝试 ' + S.wrongs + ' 次 · 不限时、不扣分';
+    const btn = $('#btnHint');
+    btn.disabled = S.finished || S.hintsUsed >= max;
+    btn.textContent = S.hintsUsed >= max ? '💡 提示已用完' :
+      (S.mode === 'challenge' ? '💡 查看提示（-10 分）' : '💡 查看提示（免费）');
+  }
+
+  function updateTimer() {
+    timerEl.hidden = !S || S.mode !== 'challenge';
+    if (timerEl.hidden) return;
+    const r = S.remaining;
+    const m = Math.floor(r / 60);
+    const s = r % 60;
+    timerEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    timerEl.classList.toggle('warn', r <= 60 && !(S && S.finished));
+    timerEl.setAttribute('aria-label', '剩余时间 ' + m + ' 分 ' + s + ' 秒');
+  }
+
+  function tick() {
+    if (!S || S.finished || S.mode !== 'challenge') return;
+    S.remaining = Math.max(0, Math.ceil((S.deadline - Date.now()) / 1000));
+    updateTimer();
+    if (S.remaining <= 0) timeUp();
+  }
+
+  function updatePreview() {
+    const t = editor.value;
+    if (!t.trim()) {
+      preview.innerHTML = '<p class="empty">✨ 在左侧输入 Markdown，这里会实时显示渲染效果</p>';
+      return;
+    }
+    try {
+      preview.innerHTML = renderBlocks(parseMarkdown(t));
+    } catch (e) {
+      preview.innerHTML = '<p class="empty">预览出错，请检查输入内容。</p>';
+    }
+  }
+
+  function setPane(p) {
+    $('#workspace').setAttribute('data-pane', p);
+    $('#tabEdit').classList.toggle('active', p === 'edit');
+    $('#tabPreview').classList.toggle('active', p === 'preview');
+  }
+
+  function useHint() {
+    if (!S || S.finished) return;
+    if (S.hintsUsed >= S.lv.hints.length) return;
+    S.hintsUsed++;
+    $('#hintList').innerHTML = S.lv.hints.slice(0, S.hintsUsed).map(function (h) {
+      return '<li>' + escapeHtml(h) + '</li>';
+    }).join('');
+    updateMeta();
+  }
+
+  function checksHtml(res) {
+    return '<ul class="checks">' + res.checks.map(function (c) {
+      return '<li class="' + (c.ok ? 'ok' : 'bad') + '"><span class="mark">' + (c.ok ? '✓' : '✗') + '</span><div>' +
+        '<div>' + escapeHtml(c.label) + '</div>' +
+        (!c.ok && c.tip ? '<div class="tip">💡 ' + escapeHtml(c.tip) + '</div>' : '') +
+        '</div></li>';
+    }).join('') + '</ul>';
+  }
+
+  function submit() {
+    if (!S || S.finished) return;
+    // 严格使用实际截止时间；避免间隔回调前的最后几毫秒抢提交。
+    if (S.mode === 'challenge' && Date.now() >= S.deadline) { timeUp(); return; }
+    const res = judge(S.lv, editor.value);
+    if (res.pass) {
+      if (S.mode === 'challenge') finish(true, res, false);
+      else finishPractice(res);
+      return;
+    }
+    if (!res.empty) S.wrongs++;
+    updateMeta();
+    const okCount = res.checks.filter(function (c) { return c.ok; }).length;
+    $('#feedback').innerHTML =
+      '<div class="fb fb-bad"><div class="fb-title">❌ 还差一点' +
+      (res.empty ? '' : '（第 ' + S.wrongs + ' 次未通过，已满足 ' + okCount + '/' + res.checks.length + ' 项）') +
+      '</div><p>' + (S.mode === 'challenge'
+        ? '⏱ 倒计时仍在继续，请修改后再次提交。本次非空错交已扣5分。'
+        : '📖 自由练习不限时、不扣分，你可以慢慢修改并再次提交。') +
+      '</p>' + checksHtml(res) + '</div>';
+    try { $('#feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) { /* ignore */ }
+  }
+
+  function finishPractice(res) {
+    if (!S || S.finished || S.mode !== 'practice') return;
+    S.finished = true;
+    editor.readOnly = true;
+    $('#btnSubmit').disabled = true;
+    // 旧版挑战成绩绝不被自由练习覆盖；只更新 practiced。
+    progress = loadProgress();
+    const prev = progress.levels[S.lv.id] || { attempts: 0, best: 0, stars: 0, passed: false, practiced: false };
+    prev.practiced = true;
+    progress.levels[S.lv.id] = prev;
+    Store.save(progress);
+    S.result = { passed: true, practice: true, res: res };
+    updateMeta();
+    renderPlayTabsOnly();
+    $('#feedback').innerHTML = '<div class="fb fb-ok"><div class="fb-title">🎉 自由练习完成！</div>' +
+      '<p>已将本关标记为练习完成。自由练习不计时、不扣分，也不会影响原有挑战积分或星星。</p>' +
+      '<div class="fb-actions">' + nextBtnHtml() +
+      '<button class="btn soft" data-action="knowledgeCard" data-level="' + S.lv.id + '">🔓 30秒知识彩蛋</button>' +
+      '<button class="btn primary" data-action="startChallenge">⏱ 试试限时挑战</button></div></div>';
+    openModal({ title: '📖 练习完成！',
+      html: '<p>本关已掌握。自由练习不产生积分或星星，现在可以继续学习或挑战计时成绩。</p>',
+      actions: [
+        { label: '⏱ 限时挑战本关', cls: 'primary', onClick: function () { startLevel(S.lv.id, 'challenge'); } },
+        { label: '🔓 30秒知识彩蛋', cls: 'soft', onClick: function() { openKnowledgeCard(S.lv.id); } },
+        { label: '下一关 →', cls: 'soft', onClick: nextLevel },
+        { label: '查看作答', cls: 'ghost' }
+      ]
+    });
+  }
+
+  function timeUp() {
+    if (!S || S.finished || S.mode !== 'challenge') return;
+    const res = judge(S.lv, editor.value);
+    finish(res.pass, res, true);
+  }
+
+  // 仅在每局限时挑战成功结算后触发一次；减少动态效果设置下完全跳过。
+  function celebrateChallenge() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const old = document.querySelector('.confetti-layer');
+    if (old) old.remove();
+    const layer = document.createElement('div');
+    layer.className = 'confetti-layer';
+    layer.setAttribute('aria-hidden', 'true');
+    const colors = ['#fbbf24', '#f472b6', '#818cf8', '#34d399', '#60a5fa', '#fb923c'];
+    const count = window.innerWidth < 600 ? 23 : 34;
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement('span');
+      const side = i % 2 === 0 ? -1 : 1;
+      const dx = side * (80 + Math.random() * Math.min(370, window.innerWidth * .36));
+      const rise = -(70 + Math.random() * 165);
+      const fall = 75 + Math.random() * 250;
+      const spin = side * (250 + Math.random() * 700);
+      piece.className = 'confetti-piece';
+      piece.style.left = (46 + Math.random() * 8) + '%';
+      piece.style.top = (34 + Math.random() * 8) + '%';
+      piece.style.backgroundColor = colors[i % colors.length];
+      piece.style.setProperty('--mid-x', (dx * .54).toFixed(0) + 'px');
+      piece.style.setProperty('--dx', dx.toFixed(0) + 'px');
+      piece.style.setProperty('--rise', rise.toFixed(0) + 'px');
+      piece.style.setProperty('--fall', fall.toFixed(0) + 'px');
+      piece.style.setProperty('--spin-mid', (spin * .35).toFixed(0) + 'deg');
+      piece.style.setProperty('--spin', spin.toFixed(0) + 'deg');
+      piece.style.animationDelay = Math.floor(Math.random() * 110) + 'ms';
+      layer.appendChild(piece);
+    }
+    document.body.appendChild(layer);
+    window.setTimeout(function () { layer.remove(); }, 1750);
+  }
+
+  function finish(passed, res, timedOut) {
+    S.finished = true;
+    clearInterval(timerId);
+    editor.readOnly = true;
+    $('#btnSubmit').disabled = true;
+
+    const hintLoss = S.hintsUsed * 10;
+    const wrongLoss = S.wrongs * 5;
+    const rawBase = 100 - hintLoss - wrongLoss;
+    const base = Math.max(40, rawBase);
+    const floorFix = base - rawBase;
+    const bonus = passed && !timedOut ? Math.round(S.remaining / TOTAL_SECONDS * 50) : 0;
+    const score = passed ? base + bonus : 0;
+    const stars = !passed ? 0 : score >= 120 ? 3 : score >= 95 ? 2 : 1;
+
+    progress = loadProgress();
+    const prev = progress.levels[S.lv.id] || { attempts: 0, best: 0, stars: 0, passed: false, practiced: false };
+    prev.attempts += 1;
+    if (passed) {
+      prev.passed = true;
+      if (score > prev.best) prev.best = score;
+      if (stars > prev.stars) prev.stars = stars;
+    }
+    progress.levels[S.lv.id] = prev;
+    Store.save(progress);
+
+    S.result = {
+      passed: passed, timedOut: timedOut, res: res, score: score, stars: stars,
+      base: base, bonus: bonus, hintLoss: hintLoss, wrongLoss: wrongLoss, floorFix: floorFix
+    };
+    updateTimer();
+    updateMeta();
+    renderPlayTabsOnly();
+    renderResultPanel();
+    showSettlement();
+    if (passed) celebrateChallenge();
+  }
+
+  function renderPlayTabsOnly() {
+    $('#levelTabs').innerHTML = playTabsHtml();
+  }
+
+  function nextBtnHtml() {
+    const hasNext = S.result && S.result.passed && !!nextCourseLevel(S.lv.id);
+    return (hasNext ? '<button class="btn primary" data-action="next">下一关 →</button>' : '') +
+      '<button class="btn soft" data-action="retry">' +
+      (S.mode === 'challenge' ? '🔄 重新挑战' : '🔄 重新练习') + '</button>' +
+      '<button class="btn ghost" data-action="home">回首页</button>';
+  }
+
+  function renderResultPanel() {
+    const r = S.result;
+    if (r.passed) {
+      $('#feedback').innerHTML =
+        '<div class="fb fb-ok"><div class="fb-title">🎉 ' + (r.timedOut ? '时间到，最终答案正确：' : '本关通过：') +
+        r.score + ' 分 <span class="stars">' + starsHtml(r.stars) + '</span></div>' +
+        '<p>挑战结束，倒计时已停止。</p><div class="fb-actions">' + nextBtnHtml() +
+        '<button class="btn soft" data-action="knowledgeCard" data-level="' + S.lv.id + '">🔓 30秒知识彩蛋</button>' + '</div></div>';
+    } else {
+      $('#feedback').innerHTML =
+        '<div class="fb fb-bad"><div class="fb-title">⏰ 时间到，本次未通关（0 分）</div>' +
+        '<p>如果没写完，可以保留当前输入继续自由练习；不会产生本次挑战积分。</p>' +
+        checksHtml(r.res) +
+        '<div class="fb-actions"><button class="btn primary" data-action="continuePractice">📖 保留答案，继续自由练习</button>' + nextBtnHtml() + '</div></div>';
+    }
+  }
+
+  function continueInPractice() {
+    if (!S || S.mode !== 'challenge' || !S.finished || !S.result || !S.result.timedOut || S.result.passed) return;
+    const id = S.lv.id;
+    const seed = editor.value;
+    startLevel(id, 'practice', seed);
+  }
+
+  function showSettlement() {
+    const r = S.result;
+    let title;
+    let html;
+    const actions = [];
+    if (r.passed) {
+      title = r.timedOut ? '⏰ 时间到 · 答案正确' : '🎉 闯关成功！';
+      html = '<div class="stars big">' + starsHtml(r.stars) + '</div>' +
+        '<table class="score">' +
+        '<tr><td>基础分</td><td>100</td></tr>' +
+        '<tr><td>使用提示 ' + S.hintsUsed + ' 次</td><td>−' + r.hintLoss + '</td></tr>' +
+        '<tr><td>错误提交 ' + S.wrongs + ' 次</td><td>−' + r.wrongLoss + '</td></tr>' +
+        (r.floorFix > 0 ? '<tr><td>最低基础分保护</td><td>+' + r.floorFix + '</td></tr>' : '') +
+        '<tr><td>剩余时间奖励</td><td>+' + r.bonus + '</td></tr>' +
+        '<tr class="total"><td>本关得分</td><td>' + r.score + '</td></tr></table>';
+    } else {
+      title = '⏰ 时间到 · 本次未通关';
+      html = '<p>5 分钟已用完，系统已自动提交你最后的作答并结算。</p>' + checksHtml(r.res);
+    }
+    const hasNext = !!nextCourseLevel(S.lv.id);
+    if (r.passed) actions.push({ label: '🔓 30秒知识彩蛋', cls: 'primary', onClick: function(){openKnowledgeCard(S.lv.id);} });
+    if (r.passed && hasNext) actions.push({ label: '下一关 →', cls: 'primary', onClick: nextLevel });
+    if (!r.passed && r.timedOut) actions.push({ label: '📖 保留答案，继续自由练习', cls: 'primary', onClick: continueInPractice });
+    actions.push({ label: '🔄 重新挑战', cls: r.passed ? 'soft' : 'primary', onClick: function () { startLevel(S.lv.id, 'challenge'); } });
+    actions.push({ label: '回首页', cls: 'ghost', onClick: goHome });
+    actions.push({ label: '查看作答', cls: 'ghost' });
+    openModal({ title: title, html: html, actions: actions });
+  }
+
+  function nextLevel() {
+    if (!S) return;
+    const next = nextCourseLevel(S.lv.id);
+    if (next) startLevel(next.id, S.mode);
+    else goHome();
+  }
+
+  function guardLeave(proceed) {
+    if (S && !S.finished && editor.value.trim()) {
+      openModal({
+        title: '确定放弃当前作答吗？',
+        html: '<p>你输入的 Markdown 还没有结算。离开后将丢失本次作答内容' + (S.mode === 'challenge' ? '，倒计时也会重置。' : '。') + '</p>',
+        actions: [
+          { label: '继续作答', cls: 'primary' },
+          { label: '放弃并离开', cls: 'danger', onClick: proceed }
+        ]
+      });
+      return;
+    }
+    proceed();
+  }
+
+  function goHome() {
+    clearInterval(timerId);
+    S = null;
+    progress = loadProgress();
+    renderHome();
+    showView('home');
+  }
+
+  /* ---------------- 弹窗 ---------------- */
+  const modalRoot = $('#modalRoot');
+  let lastFocus = null;
+
+  function openModal(opt) {
+    closeModal(true);
+    lastFocus = document.activeElement;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.innerHTML = '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">' +
+      '<h3 id="mTitle">' + opt.title + '</h3><div class="modal-body">' + opt.html + '</div>' +
+      '<div class="modal-actions"></div></div>';
+    const box = wrap.querySelector('.modal-actions');
+    opt.actions.forEach(function (a) {
+      const b = document.createElement('button');
+      b.className = 'btn ' + (a.cls || 'soft');
+      b.textContent = a.label;
+      b.addEventListener('click', function () {
+        closeModal();
+        if (a.onClick) a.onClick();
+      });
+      box.appendChild(b);
+    });
+    wrap.addEventListener('mousedown', function (e) {
+      if (e.target === wrap) closeModal();
+    });
+    modalRoot.appendChild(wrap);
+    const first = box.querySelector('button');
+    if (first) first.focus();
+  }
+
+  function closeModal(silent) {
+    modalRoot.innerHTML = '';
+    if (!silent && lastFocus && lastFocus.focus) {
+      try { lastFocus.focus(); } catch (e) { /* ignore */ }
+    }
+    lastFocus = null;
+  }
+
+  /* ---------------- 事件 ---------------- */
+  document.addEventListener('click', function (e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const act = el.getAttribute('data-action');
+    switch (act) {
+      case 'selectMode':
+        if (!S || $('#playView').hidden) {
+          selectedMode = el.getAttribute('data-mode') === 'challenge' ? 'challenge' : 'practice';
+          renderHome();
+        }
+        break;
+      case 'openLevel': {
+        const id = parseInt(el.getAttribute('data-level'), 10);
+        if (S && !$('#playView').hidden && S.lv.id === id) return;
+        const m = el.getAttribute('data-mode') || (S && S.mode) || selectedMode;
+        guardLeave(function () { startLevel(id, m); });
+        break;
+      }
+      case 'home': guardLeave(goHome); break;
+      case 'retry': if (S) guardLeave(function () { startLevel(S.lv.id, S.mode); }); break;
+      case 'startChallenge': if (S && S.finished) startLevel(S.lv.id, 'challenge'); break;
+      case 'continuePractice': continueInPractice(); break;
+      case 'knowledgeCard': openKnowledgeCard(parseInt(el.getAttribute('data-level'),10)|| (S && S.lv.id) || 2); break;
+      case 'downloadKnowledge': downloadKnowledge(); break;
+      case 'hint': useHint(); break;
+      case 'submit': submit(); break;
+      case 'next': nextLevel(); break;
+      case 'pane': setPane(el.getAttribute('data-pane')); break;
+      case 'resetAsk':
+        openModal({
+          title: '重置学习进度？',
+          html: '<p>将清除本浏览器中保存的自由练习完成记录，以及原有挑战积分、星星和通关记录，无法恢复。</p>',
+          actions: [
+            { label: '取消', cls: 'soft' },
+            {
+              label: '确认重置',
+              cls: 'danger',
+              onClick: function () {
+                Store.clear();
+                progress = { levels: {}, discoveries: {} };
+                renderHome();
+              }
+            }
+          ]
+        });
+        break;
+      default: break;
+    }
+  });
+
+  editor.addEventListener('input', updatePreview);
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.id === 'cardReflection') cardDraft = e.target.value.slice(0, 240);
+  });
+  editor.addEventListener('blur', function () { editor._free = false; });
+  editor.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      editor._free = true;
+      return;
+    }
+    if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && !editor._free && !editor.readOnly) {
+      e.preventDefault();
+      editor.setRangeText('  ', editor.selectionStart, editor.selectionEnd, 'end');
+      updatePreview();
+    } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      submit();
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modalRoot.firstChild) closeModal();
+  });
+
+  // 浏览器刷新/关闭时：有未结算的非空作答才请求浏览器确认。
+  window.addEventListener('beforeunload', function (e) {
+    if (S && !S.finished && editor.value.trim()) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  /* ---------------- 启动 ---------------- */
+  renderHome();
+  showView('home');
+})();
+</script>
+</body>
+</html>
