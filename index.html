@@ -998,7 +998,7 @@ table.score tr.total td {
       ok = false;
     }
     return {
-      persistent: ok,
+      get persistent() { return ok; },
       load: function () {
         if (ok) {
           try {
@@ -1012,8 +1012,15 @@ table.score tr.total td {
       save: function (d) {
         mem = d;
         if (ok) {
-          try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) { /* ignore */ }
+          try {
+            const value = JSON.stringify(d);
+            localStorage.setItem(STORE_KEY, value);
+            // 不仅检查能写临时测试项，还要核实真实进度确实写入成功。
+            if (localStorage.getItem(STORE_KEY) !== value) throw new Error('Storage verification failed');
+            return true;
+          } catch (e) { ok = false; }
         }
+        return false; // 降级为内存，刷新后无法保证保留；首页会明确提示。
       },
       clear: function () {
         mem = null;
@@ -2112,8 +2119,23 @@ table.score tr.total td {
     updateStickyHeader();
   }
 
-  // 本次浏览时的选择；刷新后默认自由练习，不修改已有挑战成绩。
-  let selectedMode = 'practice';
+  // 保存上次选择的训练模式，防止刷新后默认显示“自由练习 0/12”，
+  // 让已有的“限时挑战 1/12”看上去像被清零。两种进度仍独立保存。
+  const MODE_KEY = 'mdlab_v03_selected_mode';
+  function readSelectedMode() {
+    try {
+      const v = localStorage.getItem(MODE_KEY);
+      if (v === 'practice' || v === 'challenge') return v;
+    } catch (e) { /* 受限浏览器无法读取 */ }
+    // 首次升级旧版：只有挑战记录而没有自由练习记录时，默认展示挑战记录。
+    const rows = Object.keys(progress.levels).map(function (id) { return progress.levels[id]; });
+    return rows.some(function (x) { return x.passed; }) && !rows.some(function (x) { return x.practiced; })
+      ? 'challenge' : 'practice';
+  }
+  let selectedMode = readSelectedMode();
+  function rememberSelectedMode() {
+    try { localStorage.setItem(MODE_KEY, selectedMode); } catch (e) { /* 以当前页面模式运行 */ }
+  }
   function modeTitle(m) { return m === 'challenge' ? '限时挑战' : '自由练习'; }
 
 
@@ -2272,7 +2294,7 @@ table.score tr.total td {
         '</div><p class="kcard-note">没有解锁的知识卡无需提前查看；观点没有标准答案。</p></section>' +
       '<div class="note"><b>说明：</b>12 个知识点来自老师的预习任务；双模式、积分和星星是自主设计的学习工具，不是老师规定的考核。自由练习与挑战记录相互独立。</div>' +
       '<div class="foot"><span>' +
-      (Store.persistent ? '💾 进度保存在当前网页来源的浏览器存储中；同一来源下会兼容 V0.1.1 挑战成绩' : '⚠️ 当前预览环境无法使用 localStorage，记录仅在本次页面有效') +
+      (Store.persistent ? '💾 进度保存在当前网址的浏览器存储中；自由练习与限时挑战分别记录。使用无痕模式或清除站点数据可能丢失记录。' : '⚠️ 当前浏览器无法可靠写入 localStorage！进度刷新后可能丢失，请使用普通浏览模式并允许站点保存数据。') +
       '</span><button class="btn ghost" data-action="resetAsk">重置全部进度</button></div>';
   }
 
@@ -2291,6 +2313,7 @@ table.score tr.total td {
     if (!lv) return;
     mode = mode === 'challenge' ? 'challenge' : 'practice';
     selectedMode = mode;
+    rememberSelectedMode();
     S = {
       lv: lv, mode: mode,
       deadline: mode === 'challenge' ? Date.now() + TOTAL_SECONDS * 1000 : null,
@@ -2676,6 +2699,7 @@ table.score tr.total td {
       case 'selectMode':
         if (!S || $('#playView').hidden) {
           selectedMode = el.getAttribute('data-mode') === 'challenge' ? 'challenge' : 'practice';
+          rememberSelectedMode();
           renderHome();
         }
         break;
