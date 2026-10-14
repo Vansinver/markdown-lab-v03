@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Markdown 闯关实验室 V0.3 · Vansinver</title>
+<title>Markdown 闯关实验室 V0.3.2 · Vansinver</title>
 <style>
 :root {
   --bg: #f3f4ff;
@@ -368,9 +368,6 @@ textarea:focus-visible {
   .play-top .tab { padding: 5px 9px; font-size: 12px; }
   .play-top .mode-pill { padding: 4px 8px; font-size: 11px; }
   .play-top .timer { padding: 5px 9px; font-size: 18px; }
-  /* 小屏滚动时只保留紧凑的首页入口、模式和倒计时，关卡切换可滚回顶部使用。 */
-  .play-top.is-condensed .level-tabs { display: none; }
-  .play-top.is-condensed { justify-content: space-between; }
   #feedback { scroll-margin-top: 70px; }
 }
 
@@ -379,6 +376,15 @@ textarea:focus-visible {
   flex-wrap: wrap;
   gap: 8px;
   flex: 1;
+}
+
+/* 移动端将关卡导航放在普通文档流，吸顶栏始终单行且高度恒定。 */
+.mobile-level-tabs { display: none; }
+@media (max-width: 640px) {
+  .play-top { flex-wrap: nowrap; }
+  .play-top .level-tabs { display: none; }
+  .play-top .mode-pill { margin-left: auto; }
+  .mobile-level-tabs { display: flex; flex: none; margin-bottom: 12px; }
 }
 
 .tab {
@@ -922,6 +928,7 @@ table.score tr.total td {
       <span class="mode-pill" id="modePill">自由练习</span>
       <div class="timer" id="timer" role="timer">05:00</div>
     </header>
+    <nav class="level-tabs mobile-level-tabs" id="mobileLevelTabs" aria-label="手机端切换关卡"></nav>
 
     <div class="mode-notice" id="modeNotice"></div>
 
@@ -2106,17 +2113,10 @@ table.score tr.total td {
   /* =====================================================
    * 五、首页
    * ===================================================== */
-  function updateStickyHeader() {
-    const compact = !$('#playView').hidden && window.scrollY > 160;
-    $('#playView .play-top').classList.toggle('is-condensed', compact);
-  }
-  window.addEventListener('scroll', updateStickyHeader, { passive: true });
-
   function showView(v) {
     $('#homeView').hidden = v !== 'home';
     $('#playView').hidden = v !== 'play';
     window.scrollTo(0, 0);
-    updateStickyHeader();
   }
 
   // 保存上次选择的训练模式，防止刷新后默认显示“自由练习 0/12”，
@@ -2268,7 +2268,7 @@ table.score tr.total td {
     $('#homeView').innerHTML =
       '<div class="hero">' +
         '<div class="brand-signature" aria-label="由 Vansinver 设计制作"><span class="brand-monogram">V</span><span class="brand-wordmark">Vansinver</span><span class="brand-byline">· 独立创作</span></div>' +
-        '<span class="hero-tag">洞见·AI 研学社 · Markdown 基础语法练习 · V0.3 · 12关完整版</span>' +
+        '<span class="hero-tag">洞见·AI 研学社 · Markdown 基础语法练习 · V0.3.2 · 12关完整版</span>' +
         '<h1>Markdown 闯关实验室</h1>' +
         '<p>12关现已开放。先自由练习，再限时挑战；同一关只保留最高纪录，不累计刷分。</p>' +
         '<div class="stats">' +
@@ -2349,6 +2349,7 @@ table.score tr.total td {
     $('#hintList').innerHTML = '';
     $('#feedback').innerHTML = '';
     $('#levelTabs').innerHTML = playTabsHtml();
+    $('#mobileLevelTabs').innerHTML = playTabsHtml();
     updateMeta();
     setPane('edit');
   }
@@ -2558,6 +2559,7 @@ table.score tr.total td {
 
   function renderPlayTabsOnly() {
     $('#levelTabs').innerHTML = playTabsHtml();
+    $('#mobileLevelTabs').innerHTML = playTabsHtml();
   }
 
   function nextBtnHtml() {
