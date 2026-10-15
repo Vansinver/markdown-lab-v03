@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Markdown 闯关实验室 V0.3.2 · Vansinver</title>
+<title>Markdown 闯关实验室 V0.3.4 · Vansinver</title>
 <style>
 :root {
   --bg: #f3f4ff;
@@ -851,6 +851,23 @@ table.score tr.total td {
   }
 }
 
+/* V0.3.3：语法根因提醒与可选的空格可视化。只作用于教学层，不更改输入或判题。 */
+.pane-title .edit-title-actions { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
+.whitespace-toggle { font:inherit; font-size:12px; font-weight:700; border:1px solid #c7d2fe; border-radius:8px; color:#4f46e5; background:#fff; padding:4px 8px; cursor:pointer; }
+.whitespace-toggle[aria-pressed="true"] { background:#e0e7ff; border-color:#818cf8; }
+.syntax-guide { flex:none; margin:0 12px 12px; padding:10px 12px; font-size:13px; line-height:1.55; color:#83430b; background:#fffbeb; border:1px solid #fcd34d; border-radius:12px; }
+.syntax-guide[hidden], .whitespace-preview[hidden] { display:none !important; }
+.syntax-guide strong { color:#78350f; }
+.syntax-guide p { margin:3px 0 0; }
+.whitespace-preview { flex:none; margin:0 12px 12px; padding:9px 12px; background:#f4f5ff; border:1px solid #d7dcfa; border-radius:12px; max-height:165px; overflow:auto; }
+.whitespace-preview .ws-caption { font-size:12px; font-weight:700; color:#555c9f; margin:0 0 5px; }
+.whitespace-preview pre { margin:0; white-space:pre; font-size:12px; line-height:1.65; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.syntax-root-cause { margin:9px 0; padding:11px 13px; border:1px solid #fcd34d; border-radius:12px; background:#fffbeb; color:#854d0e; line-height:1.6; }
+.syntax-root-cause strong { display:block; margin-bottom:4px; }
+.syntax-details { margin-top:11px; }
+.syntax-details summary { font-size:13px; color:#6b5594; cursor:pointer; }
+@media(max-width:640px){ .pane-title { flex-wrap:wrap; gap:6px; } .pane-title .edit-title-actions { justify-content:flex-start; } }
+
 /* V0.2 双模式入口与无计时训练样式 */
 .mode-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 14px 0 16px; }
 .mode-choice { text-align: left; background: #fff; border: 2px solid var(--line); border-radius: 21px; padding: 19px 20px; color: var(--ink); box-shadow: var(--shadow); transition: border-color .15s, transform .15s, background .15s; }
@@ -874,6 +891,9 @@ table.score tr.total td {
   .mode-choice { padding: 15px 16px; }
 }
 
+/* V0.3.4：第八关常驻标点提醒，两个模式均可见，完全不参与计分 */
+.alignment-input-note { margin: 5px 0 12px !important; padding: 8px 11px; background: #f8f9ff; border: 1px solid #dde2fa; border-radius: 10px; color: #485077; font-size: 13px; line-height: 1.7; }
+.alignment-input-note code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-weight: 700; color: #3730a3; background: #edeefe; border-radius: 4px; padding: 1px 3px; }
 /* V0.2.1：可选的认知彩蛋，不影响判题与计分 */
 .topic-teaser { margin: 12px 0 0; padding: 10px 13px; border: 1px dashed #b8bef4; background: #f8f7ff; color: #4b5080; border-radius: 12px; font-size: 13px; }
 .knowledge-box { margin-top: 22px; padding: 22px; background: #fff; border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); }
@@ -939,6 +959,7 @@ table.score tr.total td {
       </div>
       <p id="taskDesc"></p>
       <ul class="req" id="taskReq"></ul>
+      <p class="alignment-input-note" id="alignmentInputNote" hidden><span aria-hidden="true">⌨️</span> <strong>输入法小提醒：</strong>表格对齐要用英文半角冒号 <code>:</code>，不是中文全角冒号 <code>：</code>。例：<code>:---</code>、<code>:---:</code>、<code>---:</code>。无需点「查看提示」，也不扣分。</p>
       <div class="topic-teaser" id="topicTeaser" hidden></div>
       <div class="hint-bar">
         <button class="btn soft" id="btnHint" data-action="hint">💡 查看提示</button>
@@ -954,7 +975,9 @@ table.score tr.total td {
 
     <div class="workspace" id="workspace" data-pane="edit">
       <div class="pane pane-edit">
-        <div class="pane-title"><span>Markdown 输入</span><span>Tab = 2 空格 · Esc 后 Tab 可离开输入框</span></div>
+        <div class="pane-title"><span>Markdown 输入</span><div class="edit-title-actions"><span>Tab = 2 空格 · Esc 后 Tab 可离开输入框</span><button type="button" class="whitespace-toggle" id="toggleWhitespace" aria-pressed="false" aria-controls="whitespacePreview">👁 显示空格</button></div></div>
+        <div class="syntax-guide" id="syntaxGuide" role="status" aria-live="polite" hidden></div>
+        <div class="whitespace-preview" id="whitespacePreview" hidden aria-label="可视化空格示意"><div class="ws-caption">· 表示普通空格；⇥ 表示 Tab。这只是辅助显示，不会修改答案。</div><pre id="whitespaceText"></pre></div>
         <textarea id="editor" maxlength="4000" spellcheck="false" autocomplete="off" autocapitalize="off"
           aria-label="Markdown 输入区" placeholder="在这里输入 Markdown……"></textarea>
       </div>
@@ -2023,7 +2046,7 @@ table.score tr.total td {
       id: 7,kp:'有序列表',icon:'1.',short:'把一个任务安排成可执行步骤',
       title:'有序列表闯关：小任务拆解',desc:'把一件事拆成有顺序的大步骤，并为第二步加入两个子步骤。',
       reqs:['三个主步骤按顺序：说明目标、分成小步骤、检查结果','在第二项下面缩进添加两个有序子步骤：先试一次、记录反馈','主列表和子列表都用数字加英文句点 . 或英文右括号 )，不要混入无序标记'],
-      hints:['有序列表用 1. 项目、2. 项目 等写法。','子步骤要缩进到父项内容列，1. 后通常缩进 3 个空格。','示例：2. 分成小步骤，下一行用3个空格后写 1. 先试一次。'],
+      hints:['有序列表符号由「数字 + 英文句点 + 空格」组成：1. 项目，不能写成 1.项目。','子步骤放在第二步下方，行首至少3个空格；本站按两次 Tab 可得到4个空格。','需要完整5行：1. 说明目标 / 2. 分成小步骤 / 缩进4格后1. 先试一次 / 缩进4格后2. 记录反馈 / 3. 检查结果。'],
       judge:judgeOrdered
     },{
       id: 8,kp:'对齐方式',icon:'⇔',short:'表格三列分别左、中、右对齐',
@@ -2268,7 +2291,7 @@ table.score tr.total td {
     $('#homeView').innerHTML =
       '<div class="hero">' +
         '<div class="brand-signature" aria-label="由 Vansinver 设计制作"><span class="brand-monogram">V</span><span class="brand-wordmark">Vansinver</span><span class="brand-byline">· 独立创作</span></div>' +
-        '<span class="hero-tag">洞见·AI 研学社 · Markdown 基础语法练习 · V0.3.2 · 12关完整版</span>' +
+        '<span class="hero-tag">洞见·AI 研学社 · Markdown 基础语法练习 · V0.3.4 · 12关完整版</span>' +
         '<h1>Markdown 闯关实验室</h1>' +
         '<p>12关现已开放。先自由练习，再限时挑战；同一关只保留最高纪录，不累计刷分。</p>' +
         '<div class="stats">' +
@@ -2344,10 +2367,15 @@ table.score tr.total td {
     $('#taskTitle').textContent = lv.title;
     $('#taskDesc').textContent = lv.desc;
     $('#taskReq').innerHTML = lv.reqs.map(function (r) { return '<li>' + escapeHtml(r) + '</li>'; }).join('');
+    // 与自由练习 / 限时挑战无关：进入第8关即显示的基础输入法提示。
+    $('#alignmentInputNote').hidden = lv.id !== 8;
     $('#topicTeaser').hidden = lv.id !== 2;
     if (lv.id === 2) $('#topicTeaser').textContent = '🔎 通关彩蛋：了解“对话助手”和“工具型助手”有什么不同。完全自选阅读，不影响成绩。';
     $('#hintList').innerHTML = '';
     $('#feedback').innerHTML = '';
+    showWhitespace = false;
+    $('#toggleWhitespace').setAttribute('aria-pressed', 'false');
+    $('#toggleWhitespace').textContent = '👁 显示空格';
     $('#levelTabs').innerHTML = playTabsHtml();
     $('#mobileLevelTabs').innerHTML = playTabsHtml();
     updateMeta();
@@ -2388,8 +2416,61 @@ table.score tr.total td {
     if (S.remaining <= 0) timeUp();
   }
 
+  // 基础语法提醒：只识别确定性较高的符号空格/子列表缩进错误，不代替结构判题。
+  // 提醒不消耗提示次数，也不会自动修改学习者的原文。
+  function syntaxIssues(text, lv) {
+    if (!lv) return [];
+    const lines = String(text).replace(/\r\n?/g, '\n').split('\n');
+    const found = [];
+    function add(n, msg) { found.push('第 ' + n + ' 行：' + msg); }
+    lines.forEach(function (line, i) {
+      const n = i + 1;
+      if (lv.kp === '标题' && /^ {0,3}#{1,6}(?=[^\s#])/.test(line)) {
+        add(n, '标题符号 # 后缺少空格，例如「# 标题」。');
+      }
+      if (lv.kp === '有序列表') {
+        if (/^ {0,12}\d{1,9}[.)](?=\S)/.test(line)) {
+          add(n, '编号后缺少空格，例如「1. 说明目标」，不能写成「1.说明目标」。');
+        } else if (/^ {0,2}\d{1,9}[.)][ \t]+(?:先试一次|记录反馈)[ \t]*$/.test(line)) {
+          add(n, '「先试一次」「记录反馈」属于第二步的子列表，行首至少缩进 3 个空格（本站可按两次 Tab 得到 4 格）。');
+        }
+      }
+      if ((lv.kp === '无序列表' || lv.kp === '任务列表') && /^ {0,12}[-*+](?=\S)/.test(line) && !/^ {0,12}[-*+]{3,}/.test(line)) {
+        add(n, '无序列表符号后缺少空格，例如「- 项目」。');
+      }
+      if (lv.kp === '任务列表' && /^ {0,12}[-*+][ \t]+\[[xX ]\](?=\S)/.test(line)) {
+        add(n, '任务框 ] 后缺少空格，例如「- [x] 写出问题」。');
+      }
+      if (lv.kp === '定义列表' && /^ {0,3}:(?=\S)/.test(line)) {
+        add(n, '定义冒号 : 后缺少空格，例如「: 用来处理文本」。');
+      }
+    });
+    return found.slice(0, 3);
+  }
+
+  let showWhitespace = false;
+  function updateSyntaxGuide() {
+    const t = editor.value;
+    const issues = S ? syntaxIssues(t, S.lv) : [];
+    const guide = $('#syntaxGuide');
+    guide.hidden = !issues.length;
+    if (issues.length) {
+      guide.innerHTML = '<strong>🔎 先检查符号和空格（免费语法提醒）</strong>' +
+        issues.map(function (msg) { return '<p>• ' + escapeHtml(msg) + '</p>'; }).join('');
+    } else {
+      guide.textContent = '';
+    }
+    const visual = $('#whitespacePreview');
+    visual.hidden = !showWhitespace;
+    if (showWhitespace) {
+      // 仅显示可见字符，不替换 textarea 内容；显示所有行方便检查行首缩进。
+      $('#whitespaceText').textContent = t.replace(/ /g, '·').replace(/\t/g, '⇥') || '（输入 Markdown 后会在这里标出空格）';
+    }
+  }
+
   function updatePreview() {
     const t = editor.value;
+    updateSyntaxGuide();
     if (!t.trim()) {
       preview.innerHTML = '<p class="empty">✨ 在左侧输入 Markdown，这里会实时显示渲染效果</p>';
       return;
@@ -2439,13 +2520,20 @@ table.score tr.total td {
     if (!res.empty) S.wrongs++;
     updateMeta();
     const okCount = res.checks.filter(function (c) { return c.ok; }).length;
+    const issues = syntaxIssues(editor.value, S.lv);
+    const rootHtml = issues.length
+      ? '<div class="syntax-root-cause"><strong>🔎 优先修复这个基础语法问题</strong>' +
+        issues.map(function (msg) { return '<div>' + escapeHtml(msg) + '</div>'; }).join('') +
+        '<div>先修复这些字符问题，再次提交；其余结构错误可能因此一起消失。</div></div>' +
+        '<details class="syntax-details"><summary>查看全部 ' + res.checks.length + ' 项检查结果</summary>' + checksHtml(res) + '</details>'
+      : checksHtml(res);
     $('#feedback').innerHTML =
       '<div class="fb fb-bad"><div class="fb-title">❌ 还差一点' +
-      (res.empty ? '' : '（第 ' + S.wrongs + ' 次未通过，已满足 ' + okCount + '/' + res.checks.length + ' 项）') +
+      (res.empty ? '' : issues.length ? '（第 ' + S.wrongs + ' 次未通过）' : '（第 ' + S.wrongs + ' 次未通过，已满足 ' + okCount + '/' + res.checks.length + ' 项）') +
       '</div><p>' + (S.mode === 'challenge'
         ? '⏱ 倒计时仍在继续，请修改后再次提交。本次非空错交已扣5分。'
         : '📖 自由练习不限时、不扣分，你可以慢慢修改并再次提交。') +
-      '</p>' + checksHtml(res) + '</div>';
+      '</p>' + rootHtml + '</div>';
     try { $('#feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) { /* ignore */ }
   }
 
@@ -2744,6 +2832,12 @@ table.score tr.total td {
     }
   });
 
+  $('#toggleWhitespace').addEventListener('click', function () {
+    showWhitespace = !showWhitespace;
+    this.setAttribute('aria-pressed', String(showWhitespace));
+    this.textContent = showWhitespace ? '🙈 隐藏空格' : '👁 显示空格';
+    updateSyntaxGuide();
+  });
   editor.addEventListener('input', updatePreview);
   document.addEventListener('input', function (e) {
     if (e.target && e.target.id === 'cardReflection') cardDraft = e.target.value.slice(0, 240);
