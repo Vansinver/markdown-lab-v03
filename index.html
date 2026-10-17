@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Markdown 闯关实验室 V0.3.4 · Vansinver</title>
+<title>Markdown 闯关实验室 V0.3.5 · Vansinver</title>
 <style>
 :root {
   --bg: #f3f4ff;
@@ -893,6 +893,7 @@ table.score tr.total td {
 
 /* V0.3.4：第八关常驻标点提醒，两个模式均可见，完全不参与计分 */
 .alignment-input-note { margin: 5px 0 12px !important; padding: 8px 11px; background: #f8f9ff; border: 1px solid #dde2fa; border-radius: 10px; color: #485077; font-size: 13px; line-height: 1.7; }
+#resourceUrlNote { overflow-wrap: anywhere; }
 .alignment-input-note code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-weight: 700; color: #3730a3; background: #edeefe; border-radius: 4px; padding: 1px 3px; }
 /* V0.2.1：可选的认知彩蛋，不影响判题与计分 */
 .topic-teaser { margin: 12px 0 0; padding: 10px 13px; border: 1px dashed #b8bef4; background: #f8f7ff; color: #4b5080; border-radius: 12px; font-size: 13px; }
@@ -959,6 +960,7 @@ table.score tr.total td {
       </div>
       <p id="taskDesc"></p>
       <ul class="req" id="taskReq"></ul>
+      <p class="alignment-input-note" id="resourceUrlNote" hidden>第 9 关练习网址（可直接复制）：<a href="https://www.markdownguide.org/basic-syntax/" target="_blank" rel="noopener noreferrer">https://www.markdownguide.org/basic-syntax/</a>。请将它写进「参考文档」的 Markdown 链接中；查看网址不消耗提示次数。</p>
       <p class="alignment-input-note" id="alignmentInputNote" hidden><span aria-hidden="true">⌨️</span> <strong>输入法小提醒：</strong>表格对齐要用英文半角冒号 <code>:</code>，不是中文全角冒号 <code>：</code>。例：<code>:---</code>、<code>:---:</code>、<code>---:</code>。无需点「查看提示」，也不扣分。</p>
       <div class="topic-teaser" id="topicTeaser" hidden></div>
       <div class="hint-bar">
@@ -1907,7 +1909,7 @@ table.score tr.total td {
       check(rows.length===3 && rows.every(function(r){return r.length===3 && r.every(function(c){return !!c.trim();});}) && ['重点','命令','资源'].every(function(s,i){return norm(rows[i][0])===norm(s);}), '三行数据结构完整','三行的首列依次为：重点、命令、资源，且每格都有内容。'),
       check(/<strong>\s*核验\s*<\/strong>/.test(h0),'重点行使用加粗语法','第1行示例单元格写 **核验**。'),
       check(/<code>\s*npm test\s*<\/code>/.test(h1),'命令行使用行内代码','第2行示例单元格写 `npm test`。'),
-      check(/<a href="https:\/\/[^\"]+"[^>]*>\s*参考文档\s*<\/a>/.test(h2),'资源行含有有效的 HTTPS 链接','第3行示例单元格写 [参考文档](https://www.mdput.com)。'),
+      check(/<a href="https:\/\/[^\"]+"[^>]*>\s*参考文档\s*<\/a>/.test(h2),'资源行含有有效的 HTTPS 链接','第3行示例单元格可使用题目给出的练习网址。'),
       check(onlyType(blocks,'table',1),'没有多余段落或列表','本关只要这张表格。')];
   }
   function judgeDivider(text,blocks) {
@@ -2057,8 +2059,8 @@ table.score tr.total td {
     },{
       id: 9,kp:'单元格内嵌',icon:'⌗',short:'在表格单元格中放加粗、代码和链接',
       title:'单元格闯关：微型资源导航',desc:'同一张表里同时练习行内强调、行内代码和链接。',
-      reqs:['表头：类型、示例、说明；三行首列依次是：重点、命令、资源','「重点」的示例单元格使用 **核验**','「命令」的示例单元格写行内代码 `npm test`','「资源」的示例单元格是标题为「参考文档」的 HTTPS 链接','每格填入内容，说明列可自行编写'],
-      hints:['表格一列里也可以用 **文字** 加粗。','反引号 `包围代码`；链接格式为 [标题](https://网址)。','参考链接：[参考文档](https://www.mdput.com)，说明列自拟即可。'],
+      reqs:['表头：类型、示例、说明；三行首列依次是：重点、命令、资源','「重点」的示例单元格使用 **核验**','「命令」的示例单元格写行内代码 `npm test`','「资源」的示例单元格是标题为「参考文档」的 HTTPS 链接；练习网址已在题目下方提供','每格填入内容，说明列可自行编写'],
+      hints:['表格一列里也可以用 **文字** 加粗。','反引号 `包围代码`；链接格式为 [标题](https://网址)。','参考链接：[参考文档](https://www.markdownguide.org/basic-syntax/)，说明列自拟即可。'],
       judge:judgeCells
     },{
       id: 10,kp:'分隔线',icon:'―',short:'用横线区分已知事实与下一步',
@@ -2291,7 +2293,7 @@ table.score tr.total td {
     $('#homeView').innerHTML =
       '<div class="hero">' +
         '<div class="brand-signature" aria-label="由 Vansinver 设计制作"><span class="brand-monogram">V</span><span class="brand-wordmark">Vansinver</span><span class="brand-byline">· 独立创作</span></div>' +
-        '<span class="hero-tag">洞见·AI 研学社 · Markdown 基础语法练习 · V0.3.4 · 12关完整版</span>' +
+        '<span class="hero-tag">洞见·AI 研学社 · Markdown 基础语法练习 · V0.3.5 · 12关完整版</span>' +
         '<h1>Markdown 闯关实验室</h1>' +
         '<p>12关现已开放。先自由练习，再限时挑战；同一关只保留最高纪录，不累计刷分。</p>' +
         '<div class="stats">' +
@@ -2367,6 +2369,7 @@ table.score tr.total td {
     $('#taskTitle').textContent = lv.title;
     $('#taskDesc').textContent = lv.desc;
     $('#taskReq').innerHTML = lv.reqs.map(function (r) { return '<li>' + escapeHtml(r) + '</li>'; }).join('');
+    $('#resourceUrlNote').hidden = lv.id !== 9;
     // 与自由练习 / 限时挑战无关：进入第8关即显示的基础输入法提示。
     $('#alignmentInputNote').hidden = lv.id !== 8;
     $('#topicTeaser').hidden = lv.id !== 2;
